@@ -1,0 +1,38 @@
+<view class="container" wx:if="{{room}}">
+  <view class="card room-hero">
+    <view class="room-top"><text class="game-name">{{room.game}}</text><text class="badge {{room.isReadyState ? 'ready-badge' : ''}} {{room.isPendingState ? 'pending-badge' : ''}}">{{room.statusText}}</text></view>
+    <view class="mode">{{room.mode || '一起开黑'}}</view>
+    <view class="meta"><text>{{room.startTimeLabel}}</text><text>{{participants.length}} / {{room.maxPlayers}} 人</text></view>
+    <view wx:if="{{room.remark}}" class="remark">{{room.remark}}</view>
+  </view>
+
+  <view class="section-title"><view>队友 <text class="muted">{{participants.length}} 人</text></view><text wx:if="{{room.isReadyState || room.isPendingState}}" class="ready-hint">全员已准备</text></view>
+  <view class="card members">
+    <view class="member" wx:for="{{participants}}" wx:key="openid">
+      <view class="avatar">{{item.displayNameInitial}}</view>
+      <view class="member-info"><text>{{item.displayName}}</text><text class="member-role">{{item.isHost ? '房主' : '队员'}}</text></view>
+      <text class="ready {{item.ready ? 'is-ready' : ''}}">{{item.ready ? '准备好了' : '未准备'}}</text>
+      <text wx:if="{{isHost && !item.isHost}}" class="kick" bindtap="kickMember" data-openid="{{item.openid}}">移除</text>
+    </view>
+  </view>
+
+  <view class="section-title">简单聊天</view>
+  <view class="card chat-card">
+    <scroll-view scroll-y class="messages" scroll-into-view="{{lastMessageId}}">
+      <view wx:if="{{!messages.length}}" class="empty-chat">说点什么，喊大家准备上号吧</view>
+      <view wx:for="{{messages}}" wx:key="_id" id="msg-{{item._id}}" class="message">
+        <text class="message-name">{{item.displayName}}</text><text>{{item.content}}</text>
+      </view>
+    </scroll-view>
+    <view class="chat-input"><input placeholder="输入消息" maxlength="200" value="{{messageContent}}" bindinput="onMessageInput" bindconfirm="sendMessage"/><button bindtap="sendMessage" disabled="{{!messageContent}}">发送</button></view>
+  </view>
+
+  <view class="actions">
+    <button wx:if="{{!isHost}}" class="primary-button" bindtap="toggleReady">{{myReady ? '取消准备' : '我准备好了'}}</button>
+    <button wx:if="{{isHost}}" class="primary-button" bindtap="toggleReady">{{myReady ? '取消准备' : '房主已准备'}}</button>
+    <button wx:if="{{isHost && room.isPendingState}}" class="start-button" bindtap="startRoom">开始游戏</button>
+    <button wx:if="{{!isHost}}" class="secondary-button" bindtap="leaveRoom">退出房间</button>
+    <button wx:if="{{isHost}}" class="danger-button" bindtap="dissolveRoom">解散房间</button>
+  </view>
+</view>
+<view wx:else class="container"><view class="empty">房间加载中…</view></view>

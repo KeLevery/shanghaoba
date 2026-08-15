@@ -1,0 +1,10 @@
+<view class="container">
+  <view class="page-title">我的</view>
+  <view class="page-subtitle">设置一个游戏昵称，让朋友认出你</view>
+  <view class="card">
+    <view class="field-label">游戏昵称</view>
+    <input value="{{gameNickname}}" maxlength="20" placeholder="例如：Kele#1234" bindinput="onNicknameInput" />
+    <button class="primary-button save" bindtap="save" loading="{{saving}}">保存</button>
+  </view>
+  <view class="card privacy"><view>隐私说明</view><text>只保存用于房间展示的游戏昵称；不收集游戏账号或密码。</text></view>
+</view>

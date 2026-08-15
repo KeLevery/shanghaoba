@@ -1,0 +1,16 @@
+.my-rooms-section { margin-bottom: 24rpx; }
+  .my-room-card { position: relative; border: 2rpx solid #263240; }
+  .role-badge { color: #263240; background: #eef0f3; border-radius: 8rpx; padding: 8rpx 12rpx; font-size: 22rpx; }
+  .my-room-status { margin-top: 18rpx; color: #2c9c68; font-size: 24rpx; }
+  .my-room-card:active { background: #f7f8fa; }
+
+.section-head { display: flex; justify-content: space-between; font-size: 32rpx; font-weight: 600; margin: 18rpx 4rpx; }
+.room-card { padding: 28rpx; }
+.room-top, .room-bottom { display: flex; justify-content: space-between; align-items: center; }
+.game-name { font-size: 34rpx; font-weight: 600; }
+.room-status { color: #2c9c68; background: #eaf8f0; border-radius: 8rpx; padding: 8rpx 14rpx; font-size: 24rpx; }
+.room-mode { margin: 20rpx 0; color: #596170; }
+.room-bottom { font-size: 25rpx; }
+.tabbar { position: fixed; bottom: 0; left: 0; right: 0; height: 110rpx; background: #fff; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4rpx 20rpx rgba(0,0,0,.05); }
+.tab { color: #9aa1ac; font-size: 26rpx; }
+.tab.active { color: #20242d; font-weight: 600; }

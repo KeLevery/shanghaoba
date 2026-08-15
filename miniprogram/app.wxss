@@ -1,0 +1,17 @@
+page {
+  background: #f7f8fa;
+  color: #20242d;
+  font-size: 28rpx;
+}
+
+button::after { border: none; }
+
+.container { min-height: 100vh; padding: 32rpx; box-sizing: border-box; }
+.page-title { font-size: 48rpx; font-weight: 700; margin: 12rpx 0 8rpx; }
+.page-subtitle { color: #8a919e; font-size: 26rpx; margin-bottom: 32rpx; }
+.card { background: #fff; border-radius: 24rpx; padding: 28rpx; margin-bottom: 24rpx; box-shadow: 0 8rpx 30rpx rgba(32,36,45,.04); }
+.primary-button { background: #1f2937; color: #fff; border-radius: 16rpx; font-size: 30rpx; line-height: 92rpx; height: 92rpx; }
+.secondary-button { background: #eef0f3; color: #303641; border-radius: 16rpx; font-size: 28rpx; line-height: 84rpx; height: 84rpx; }
+.danger-button { background: #fff0f0; color: #df4d4d; border-radius: 16rpx; font-size: 28rpx; line-height: 84rpx; height: 84rpx; }
+.muted { color: #8a919e; }
+.empty { text-align: center; padding: 80rpx 20rpx; color: #9aa1ac; }

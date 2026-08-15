@@ -1,0 +1,11 @@
+.room-hero { background: linear-gradient(135deg, #263240, #1d2632); color: #fff; }
+  .ready-badge { background: #2c9c68; }
+  .pending-badge { background: #3a5a99; }
+  .ready-hint { color: #2c9c68; font-size: 25rpx; font-weight: 600; }
+  .start-button { background: #2c9c68; color: #fff; border-radius: 16rpx; font-size: 30rpx; line-height: 92rpx; height: 92rpx; font-weight: 600; }
+.room-top, .meta { display: flex; justify-content: space-between; align-items: center; }
+.game-name { font-size: 40rpx; font-weight: 700; }.badge { font-size: 24rpx; padding: 8rpx 16rpx; border-radius: 8rpx; background: rgba(255,255,255,.15); }
+.mode { font-size: 30rpx; opacity: .85; margin: 24rpx 0; }.meta { color: #d6dce4; font-size: 25rpx; }.remark { margin-top: 24rpx; padding-top: 22rpx; border-top: 1rpx solid rgba(255,255,255,.16); color: #e7ebef; }
+.section-title { font-size: 32rpx; font-weight: 600; margin: 30rpx 4rpx 18rpx; }.member { display: flex; align-items: center; min-height: 90rpx; gap: 18rpx; }.member + .member { border-top: 1rpx solid #edf0f3; }
+.avatar { width: 56rpx; height: 56rpx; line-height: 56rpx; text-align: center; border-radius: 50%; background: #e8ecf0; color: #4a5564; }.member-info { flex: 1; display: flex; flex-direction: column; gap: 6rpx; }.member-role { font-size: 22rpx; color: #9aa1ac; }.ready { color: #9aa1ac; font-size: 24rpx; }.ready.is-ready { color: #2c9c68; }.kick { color: #e65353; font-size: 24rpx; margin-left: 12rpx; }
+.chat-card { padding-bottom: 18rpx; }.messages { height: 260rpx; }.message { padding: 10rpx 0; line-height: 1.6; word-break: break-all; }.message-name { color: #748093; margin-right: 14rpx; }.empty-chat { color: #a0a7b2; text-align: center; padding: 90rpx 0; font-size: 24rpx; }.chat-input { display: flex; align-items: center; gap: 16rpx; padding-top: 16rpx; border-top: 1rpx solid #edf0f3; }.chat-input input { flex: 1; height: 64rpx; text-align: left; background: #f5f6f8; padding: 0 18rpx; border-radius: 10rpx; }.chat-input button { margin: 0; line-height: 64rpx; height: 64rpx; padding: 0 22rpx; color: #fff; font-size: 26rpx; background: #263240; border-radius: 10rpx; }.actions { display: flex; flex-direction: column; gap: 18rpx; padding-bottom: 30rpx; }

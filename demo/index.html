@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>上号吧 · Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { background: #e9ebef; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; color: #20242d; }
+  .phone { max-width: 420px; margin: 0 auto; min-height: 100vh; background: #f7f8fa; position: relative; padding-bottom: calc(120px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,.12); }
+  @media (max-width: 420px) { body { background: #f7f8fa; } .phone { max-width: none; box-shadow: none; } }
+  .status-bar { height: 34px; background: #fff; display: flex; align-items: flex-end; justify-content: center; font-size: 12px; color: #555; }
+  .nav-title { position: relative; text-align: center; font-size: 17px; font-weight: 600; background: #fff; padding: 12px 0; border-bottom: 1px solid #f0f1f3; }
+  .nav-back { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: #596170; font: inherit; font-size: 14px; cursor: pointer; }
+  .container { padding: 20px 16px; }
+  .page-title { font-size: 24px; font-weight: 700; margin: 8px 0 4px; }
+  .page-subtitle { color: #8a919e; font-size: 13px; margin-bottom: 20px; }
+  .hero { background: linear-gradient(135deg, #263240, #1d2632); border-radius: 16px; padding: 22px 20px; color: #fff; margin-bottom: 18px; }
+  .hero .title { font-size: 26px; font-weight: 700; }
+  .hero .sub { font-size: 13px; opacity: .8; margin: 4px 0 16px; }
+  .btn { border: none; border-radius: 12px; font-size: 15px; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: #1f2937; color: #fff; width: 100%; padding: 14px 0; font-weight: 600; }
+  .btn-secondary { background: #eef0f3; color: #303641; width: 100%; padding: 13px 0; }
+  .btn-danger { background: #fff0f0; color: #df4d4d; width: 100%; padding: 13px 0; }
+  .btn-small { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+  .btn-green { background: #2c9c68; color: #fff; }
+  .btn-outline { background: #eaf8f0; color: #2c9c68; }
+  .btn-gray { background: #f1f2f4; color: #666; }
+  .section-head { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; margin: 14px 2px; }
+  .section-head .muted { font-size: 13px; color: #8a919e; font-weight: 400; }
+  .refresh-button { border: 0; border-radius: 8px; padding: 6px 10px; background: #eef0f3; color: #596170; font: inherit; font-size: 12px; cursor: pointer; }
+  .refresh-button:active { background: #dfe3e8; transform: scale(.96); }
+  .card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(32,36,45,.05); }
+  .room-top, .room-bottom { display: flex; justify-content: space-between; align-items: center; }
+  .game-name { font-size: 17px; font-weight: 600; }
+  .badge { font-size: 12px; padding: 3px 9px; border-radius: 6px; background: #eaf8f0; color: #2c9c68; }
+  .badge.gray { background: #f1f2f4; color: #666; }
+  .room-mode { margin: 10px 0; color: #596170; font-size: 14px; }
+  .room-bottom { font-size: 13px; color: #8a919e; }
+  .empty { text-align: center; padding: 60px 20px; color: #9aa1ac; font-size: 13px; line-height: 2; }
+  .form-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; }
+  .form-item .label { font-size: 15px; flex-shrink: 0; }
+  .required { color: #e65353; }
+  .picker-value { color: #586071; display: flex; align-items: center; gap: 6px; }
+  .picker-value select, .form-item input, textarea { font-family: inherit; font-size: 14px; border: none; outline: none; background: transparent; text-align: right; color: #586071; }
+  .form-item input { text-align: right; }
+  textarea { width: 100%; background: #f5f6f8; border-radius: 10px; padding: 10px; margin-top: 10px; min-height: 56px; resize: none; }
+  .divider { height: 1px; background: #edf0f3; }
+  .stepper { display: flex; align-items: center; gap: 14px; }
+  .step { height: 30px; width: 30px; text-align: center; line-height: 28px; border-radius: 50%; background: #eef0f3; color: #515967; font-size: 18px; cursor: pointer; user-select: none; }
+  .number { min-width: 56px; text-align: center; font-size: 15px; }
+  .tip { text-align: center; margin-top: 14px; color: #9aa1ac; font-size: 12px; }
+  .room-hero { background: linear-gradient(135deg, #263240, #1d2632); border-radius: 16px; padding: 20px; color: #fff; margin-bottom: 16px; }
+  .room-hero .meta { display: flex; justify-content: space-between; align-items: center; color: #d6dce4; font-size: 13px; margin-top: 14px; }
+  .copy-code { background: rgba(255,255,255,.15); padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .room-hero .mode { font-size: 15px; opacity: .85; margin: 14px 0 4px; }
+  .remark { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.16); color: #e7ebef; font-size: 13px; }
+  .member { display: flex; align-items: center; min-height: 52px; gap: 12px; }
+  .member + .member { border-top: 1px solid #edf0f3; }
+  .avatar { width: 38px; height: 38px; line-height: 38px; text-align: center; border-radius: 50%; background: #e8ecf0; color: #4a5564; font-size: 14px; flex-shrink: 0; }
+  .member-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .member-role { font-size: 11px; color: #9aa1ac; }
+  .ready-text { color: #9aa1ac; font-size: 12px; }
+  .ready-text.on { color: #2c9c68; }
+  .kick { color: #e65353; font-size: 12px; margin-left: 10px; cursor: pointer; }
+  .chat-card { padding-bottom: 12px; }
+  .chat-card .lock-tip { padding: 8px 0 4px; text-align: center; color: #9aa1ac; font-size: 12px; }
+  .messages { height: 200px; overflow-y: auto; }
+  .message { padding: 6px 0; font-size: 14px; line-height: 1.6; word-break: break-all; }
+  .message-name { color: #748093; margin-right: 8px; }
+  .empty-chat { color: #a0a7b2; text-align: center; padding: 60px 0; font-size: 12px; }
+  .chat-input { display: flex; align-items: center; gap: 10px; padding-top: 10px; border-top: 1px solid #edf0f3; }
+  .chat-input input { flex: 1; height: 38px; text-align: left; background: #f5f6f8; padding: 0 12px; border-radius: 8px; font-size: 14px; }
+  .chat-input .btn { padding: 0 14px; height: 38px; line-height: 38px; font-size: 13px; background: #263240; color: #fff; border-radius: 8px; }
+  .actions { display: flex; flex-direction: column; gap: 12px; }
+  .field-label { margin-bottom: 10px; font-weight: 600; font-size: 15px; }
+  .profile-input { width: 100%; height: 44px; padding: 0 12px; background: #f5f6f8; border-radius: 10px; border: none; font-size: 15px; }
+  .privacy { color: #596170; font-size: 13px; line-height: 1.8; }
+  .privacy b { display: block; margin-bottom: 4px; color: #20242d; }
+  .tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; height: calc(64px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: #fff; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4px 16px rgba(0,0,0,.06); }
+  .tab { color: #9aa1ac; font-size: 13px; cursor: pointer; }
+  .tab.active { color: #20242d; font-weight: 600; }
+  .toast { position: fixed; top: 12%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.75); color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; z-index: 99; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .hide { display: none; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 7px 12px; border-radius: 20px; background: #f1f2f4; color: #586071; font-size: 13px; cursor: pointer; border: 1.5px solid transparent; }
+  .chip.on { background: #263240; color: #fff; }
+  .time-pick { width: 100%; display: flex; flex-wrap: wrap; gap: 8px; }
+  .demo-tag { position: fixed; top: 0; right: 8px; background: #ffd591; color: #ad4e00; font-size: 11px; padding: 4px 8px; border-radius: 0 0 6px 6px; z-index: 50; }
+  input[type="datetime-local"] { width: 100%; background: #f5f6f8; border-radius: 10px; padding: 10px 12px; color: #586071; text-align: left; }
+  .my-room-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1.5px solid #1f2937; border-radius: 14px; padding: 14px 16px; cursor: pointer; box-shadow: 0 4px 16px rgba(32,36,45,.10); }
+  .my-room-title { font-size: 15px; font-weight: 600; }
+  .my-room-sub { font-size: 12px; color: #8a919e; margin-top: 3px; }
+  .my-room-list { display: flex; flex-direction: column; gap: 10px; }
+  .my-room-role { color: #2c9c68; font-size: 12px; font-weight: 600; }
+  .ready-hint { color: #2c9c68; font-size: 13px; font-weight: 600; }
+  .invite-bar { display: flex; gap: 8px; background: #fff; border-radius: 14px; padding: 8px; box-shadow: 0 4px 16px rgba(32,36,45,.05); }
+  .invite-bar input { flex: 1; height: 38px; padding: 0 12px; }
+  .invite-bar .btn { white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="demo-tag">网页 Demo（模拟小程序界面）</div>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="nav-title" id="navTitle"><button class="nav-back hide" id="navBack" onclick="goBack()">‹ 返回</button><span id="navTitleText">上号吧</span></div>
+  <div id="views">
+
+    <!-- ===== 首页 ===== -->
+    <div id="view-home">
+      <div class="container">
+        <div class="hero">
+          <div class="title">上号吧</div>
+          <div class="sub">喊一声，朋友就位</div>
+          <button class="btn btn-primary" style="background:#fff;color:#1d2632" onclick="goCreate()">＋ 发起上号</button>
+        </div>
+        <div class="section-head"><span>正在召集</span><button class="refresh-button" type="button" onclick="refreshHome()">↻ 刷新</button></div>
+        <div id="myRoomBar" style="margin-bottom:14px"></div>
+        <div id="homeList"></div>
+      </div>
+    </div>
+
+    <!-- ===== 发起上号 ===== -->
+    <div id="view-create" class="hide">
+      <div class="container">
+        <div class="page-title">发起上号</div>
+        <div class="page-subtitle">建个房间，把朋友喊来一起玩</div>
+        <div class="card">
+          <div class="form-item" style="flex-direction:column;align-items:stretch;padding:12px 0 8px">
+            <span class="label">游戏 <span class="required">*</span></span>
+            <div class="chip-row" id="gameChips" style="margin-top:12px"></div>
+            <input id="fCustomGame" class="profile-input" style="margin-top:10px" placeholder="或输入其他游戏，例如：我的世界 / 云顶之弈" maxlength="20" oninput="onCustomGameInput()" />
+          </div>
+          <div class="divider"></div>
+          <div class="form-item">
+            <span class="label">模式 / 地图</span>
+            <input id="fMode" placeholder="例如：排位、竞技模式" maxlength="30" />
+          </div>
+          <div class="divider"></div>
+          <div class="form-item">
+            <span class="label">需要人数 <span class="required">*</span></span>
+            <div class="stepper">
+              <div class="step" onclick="stepPlayers(-1)">−</div>
+              <div class="number" id="fPlayers">5 人</div>
+              <div class="step" onclick="stepPlayers(1)">＋</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="form-item">
+            <span class="label">开打时间 <span class="required">*</span></span>
+            <div class="time-pick" id="timeChips"></div>
+          </div>
+          <div class="divider"></div>
+          <div class="form-item" style="flex-direction:column;align-items:stretch;padding:12px 0 8px">
+            <span class="label">或自己输入时间</span>
+            <input id="fCustomTimeText" class="profile-input" placeholder="例如：周五晚 8 点 / 后天下午 3 点" maxlength="30" oninput="onCustomTimeInput()" />
+          </div>
+          <div class="divider"></div>
+          <div class="form-item" style="flex-direction:column;align-items:stretch;padding:12px 0 4px">
+            <span class="label">备注</span>
+            <textarea id="fRemark" placeholder="有什么想说的？" maxlength="100"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="submitCreate()">发起召集</button>
+        <div class="tip">房间 2 小时无活动后会自动解散</div>
+      </div>
+    </div>
+
+    <!-- ===== 房间详情 ===== -->
+    <div id="view-room" class="hide">
+      <div class="container" id="roomBody"></div>
+    </div>
+
+    <!-- ===== 我的 ===== -->
+    <div id="view-profile" class="hide">
+      <div class="container">
+        <div class="page-title">我的</div>
+        <div class="page-subtitle">设置一个游戏昵称，让朋友认出你</div>
+        <div class="card">
+          <div class="field-label">游戏昵称</div>
+          <input class="profile-input" id="pNickname" placeholder="例如：Kele#1234" maxlength="20" />
+          <button class="btn btn-primary" style="margin-top:14px" onclick="saveProfile()">保存</button>
+        </div>
+        <div class="card privacy">
+          <b>隐私说明</b>
+          只保存用于房间展示的游戏昵称；不收集游戏账号或密码。
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tabbar">
+    <div class="tab active" id="tabHome" onclick="switchTab('home')">首页</div>
+    <div class="tab" id="tabProfile" onclick="switchTab('profile')">我的</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 数据（模拟云数据库，localStorage 持久化） =====
+const GAMES = ['无畏契约', '三角洲行动', 'CS2', '英雄联盟', '永劫无间', '王者荣耀', '和平精英', 'APEX', '绝地求生', '原神', 'DOTA2', '守望先锋'];
+const DEFAULT_PLAYERS = { '无畏契约': 5, '三角洲行动': 4, 'CS2': 5, '英雄联盟': 5, '永劫无间': 3, '王者荣耀': 5, '和平精英': 4, 'APEX': 3, '绝地求生': 4, '原神': 4, 'DOTA2': 5, '守望先锋': 5 };
+const TIME_LABELS = ['现在开打', '今晚', '明天', '自定义输入'];
+
+let state = {
+  rooms: [],
+  currentRoomId: null,
+  myNickname: '',
+  selectedGame: '无畏契约',
+  selectedTime: '现在开打',
+  players: 5,
+};
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('shb_demo'));
+    if (d) { state.rooms = d.rooms || []; state.myNickname = d.myNickname || ''; }
+  } catch (e) {}
+  if (!state.rooms.length) seed();
+}
+function save() { localStorage.setItem('shb_demo', JSON.stringify({ rooms: state.rooms, myNickname: state.myNickname })); }
+function seed() {
+  const now = Date.now();
+  state.rooms = [
+    { id: 'demo1', inviteCode: 'KD42', game: '无畏契约', mode: '排位·竞技', maxPlayers: 5, startTimeLabel: '现在开打', remark: '五排差俩，来会玩的', hostOpenid: 'hostA', status: 'recruiting', members: [ {openid:'hostA', name:'Kele', isHost:true, ready:true}, {openid:'u1', name:'小野', isHost:false, ready:true} ], messages: [{name:'Kele', text:'差俩人，速来'},{name:'小野', text:'来了来了'}] },
+    { id: 'demo2', inviteCode: 'XQ29', game: '三角洲行动', mode: '烽火地带', maxPlayers: 4, startTimeLabel: '今晚', remark: '', hostOpenid: 'hostB', status: 'recruiting', members: [ {openid:'hostB', name:'老王', isHost:true, ready:false}, {openid:'u2', name:'阿离', isHost:false, ready:true} ], messages: [{name:'老王', text:'晚上 8 点准时'}] },
+    { id: 'demo3', inviteCode: 'M7Z8', game: 'CS2', mode: '竞技模式', maxPlayers: 5, startTimeLabel: '明天', remark: '黄金分段友好局', hostOpenid: 'hostC', status: 'full', members: [ {openid:'hostC', name:'阿伟', isHost:true, ready:false}, {openid:'u3', name:'Luna', isHost:false, ready:false}, {openid:'u4', name:'老莫', isHost:false, ready:false}, {openid:'u5', name:'茶茶', isHost:false, ready:false}, {openid:'u6', name:'Zeta', isHost:false, ready:true} ], messages: [] },
+  ];
+  save();
+}
+
+// ===== 工具 =====
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 1600); }
+function statusText(s) { return s === 'ready' ? '✓ 已就绪' : s === 'pending' ? '待房主开始' : s === 'full' ? '已满' : s === 'dissolved' ? '已解散' : '招募中'; }
+function initOf(name) { const n = (name || '').trim(); return n ? n.slice(0, 2) : '友'; }
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function genCode() {
+  let c = '';
+  for (let i = 0; i < 4; i++) c += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+  return c;
+}
+function joinByInvite() {
+  const v = (document.getElementById('inviteInput') || {}).value || '';
+  const code = v.trim().toUpperCase();
+  if (!code) return toast('请输入邀请码');
+  const r = state.rooms.find(x => x.status !== 'dissolved' && (x.inviteCode || '').toUpperCase() === code);
+  if (!r) return toast('邀请码不存在或房间已解散');
+  openRoom(r.id);
+  if (!r.members.some(m => m.openid === 'me')) toast('已通过邀请码进入房间预览');
+}
+
+// ===== 首页 =====
+function refreshHome() {
+  renderHome();
+  toast('已刷新');
+}
+function renderHome() {
+  const list = state.rooms.filter(r => r.status !== 'dissolved');
+  const myRooms = list
+    .filter(r => r.hostOpenid === 'me' || r.members.some(m => m.openid === 'me'))
+    .sort((a, b) => {
+      const aHost = a.hostOpenid === 'me';
+      const bHost = b.hostOpenid === 'me';
+      if (aHost !== bHost) return aHost ? -1 : 1;
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
+  document.getElementById('myRoomBar').innerHTML = myRooms.length
+    ? `<div class="my-room-list">${myRooms.map(r => {
+        const isHost = r.hostOpenid === 'me';
+        return `<div class="my-room-bar" onclick="openRoom('${r.id}')">
+          <div>
+            <div class="my-room-title">🏠 ${r.game} <span class="my-room-role">${isHost ? '房主' : '已加入'}</span></div>
+            <div class="my-room-sub">${r.members.length}/${r.maxPlayers} 人 · ${r.startTimeLabel} · ${statusText(r.status)}</div>
+          </div>
+          <span style="font-size:12px;color:#586071">进入 →</span>
+        </div>`;
+      }).join('')}</div>`
+    : `<div class="invite-bar">
+         <input id="inviteInput" class="profile-input" placeholder="👋 有码吗？输入邀请码直达房间" maxlength="8" onkeydown="if(event.key==='Enter')joinByInvite()" />
+         <button class="btn btn-small btn-green" onclick="joinByInvite()">进房</button>
+       </div>`;
+  const el = document.getElementById('homeList');
+  if (!list.length) { el.innerHTML = '<div class="empty">暂时没有正在召集的房间<br/>发起一局，喊朋友上号吧</div>'; return; }
+  el.innerHTML = list.map(r => `
+    <div class="card" style="cursor:pointer" onclick="openRoom('${r.id}')">
+      <div class="room-top">
+        <span class="game-name">${r.game}</span>
+        <span class="badge ${r.status==='full'?'gray':''}">${statusText(r.status)}</span>
+      </div>
+      <div class="room-mode">${r.mode || '一起开黑'}</div>
+      <div class="room-bottom"><span>${r.members.length} / ${r.maxPlayers} 人</span><span>${r.startTimeLabel}</span></div>
+    </div>`).join('');
+}
+
+// ===== 发起上号 =====
+function goCreate() {
+  switchTab('create');
+  renderGameChips();
+  renderTimeChips();
+}
+function renderGameChips() {
+  document.getElementById('gameChips').innerHTML = GAMES.map(g => `<div class="chip ${g===state.selectedGame?'on':''}" onclick="pickGame('${g}')">${g}</div>`).join('');
+}
+function renderTimeChips() {
+  document.getElementById('timeChips').innerHTML = TIME_LABELS.map(t => `<div class="chip ${t===state.selectedTime?'on':''}" onclick="pickTime('${t}')">${t}</div>`).join('');
+  document.getElementById('fCustomTimeText').classList.toggle('hide', state.selectedTime !== '自定义输入');
+}
+function pickGame(g) {
+  state.selectedGame = g;
+  state.players = DEFAULT_PLAYERS[g];
+  document.getElementById('fPlayers').textContent = state.players + ' 人';
+  renderGameChips();
+}
+function pickTime(t) {
+  state.selectedTime = t;
+  renderTimeChips();
+}
+function stepPlayers(d) {
+  state.players = Math.max(2, Math.min(20, state.players + d));
+  document.getElementById('fPlayers').textContent = state.players + ' 人';
+}
+function onCustomGameInput() {
+  const v = document.getElementById('fCustomGame').value.trim();
+  if (!v) return;
+  state.selectedGame = v;
+  document.getElementById('gameChips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+}
+function onCustomTimeInput() {
+  const v = document.getElementById('fCustomTimeText').value.trim();
+  if (!v) return;
+  state.selectedTime = v;
+  document.getElementById('timeChips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+}
+function submitCreate() {
+  const mode = document.getElementById('fMode').value.trim();
+  const remark = document.getElementById('fRemark').value.trim();
+  const customGame = document.getElementById('fCustomGame').value.trim();
+  const customTime = document.getElementById('fCustomTimeText').value.trim();
+  const game = customGame || state.selectedGame;
+  const startTimeLabel = (state.selectedTime === '自定义输入')
+    ? (customTime || '')
+    : state.selectedTime;
+  if (!game) return toast('请选择或输入游戏');
+  if (!startTimeLabel) return toast('请选择或输入开打时间');
+  const now = Date.now();
+  const room = {
+    id: 'r' + now,
+    inviteCode: genCode(),
+    game,
+    mode,
+    maxPlayers: state.players,
+    startTimeLabel,
+    remark,
+    hostOpenid: 'me',
+    status: 'recruiting',
+    updatedAt: now,
+    members: [{ openid: 'me', name: state.myNickname || '我', isHost: true, ready: false }],
+    messages: [],
+  };
+  state.rooms.unshift(room);
+  save();
+  toast('召集已发起');
+  openRoom(room.id);
+}
+
+// ===== 房间详情 =====
+function findRoom(id) { return state.rooms.find(r => r.id === id); }
+function openRoom(id) {
+  const r = findRoom(id);
+  if (!r) return toast('房间不存在或已解散');
+  state.currentRoomId = id;
+  switchTab('room');
+  document.getElementById('navTitleText').textContent = r.game;
+  renderRoom();
+}
+function copyInvite(code) {
+  const ok = navigator.clipboard && navigator.clipboard.writeText(code);
+  if (ok) { ok.then(() => toast('邀请码已复制：' + code)).catch(() => fallbackCopy(code)); }
+  else fallbackCopy(code);
+}
+function fallbackCopy(code) {
+  const ta = document.createElement('textarea');
+  ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('邀请码已复制：' + code); } catch (e) { toast('复制失败，请记下：' + code); }
+  document.body.removeChild(ta);
+}
+function myInRoom(r) { return r.members.some(m => m.openid === 'me'); }
+function renderRoom() {
+  const r = findRoom(state.currentRoomId);
+  if (!r) { document.getElementById('roomBody').innerHTML = '<div class="empty">房间不存在或已解散</div>'; return; }
+  const me = r.members.find(m => m.openid === 'me');
+  const isHost = r.hostOpenid === 'me';
+  const isMember = !!me;
+  const myReady = me ? me.ready : false;
+
+  let body = `
+    <div class="room-hero">
+      <div class="room-top">
+        <span class="game-name">${r.game}</span>
+        <span class="badge ${r.status==='full'?'gray':''}" style="background:${r.status==='ready' ? '#2c9c68' : r.status==='pending' ? '#3a5a99' : 'rgba(255,255,255,.15)'};color:#fff">${statusText(r.status)}</span>
+      </div>
+      <div class="mode">${r.mode || '一起开黑'}</div>
+      <div class="meta"><span>${r.startTimeLabel}</span><span>${r.members.length} / ${r.maxPlayers} 人</span></div>
+      <div class="meta"><span>🔑 邀请码 <b style="font-size:17px;letter-spacing:2px">${r.inviteCode || '—'}</b></span><span class="copy-code" onclick="copyInvite('${r.inviteCode || ''}')">复制</span></div>
+      ${r.remark ? `<div class="remark">${r.remark}</div>` : ''}
+    </div>
+
+    <div class="section-head"><span>队友 <span class="muted">${r.members.length} 人</span></span>${(r.status === 'ready' || r.status === 'pending') ? '<span class="ready-hint">全员已准备</span>' : ''}</div>
+    <div class="card">
+      ${r.members.map(m => `
+        <div class="member">
+          <div class="avatar">${initOf(m.name)}</div>
+          <div class="member-info"><span>${m.name}</span><span class="member-role">${m.isHost ? '房主' : '队员'}</span></div>
+          <span class="ready-text ${m.ready ? 'on' : ''}">${m.ready ? '准备好了' : '未准备'}</span>
+          ${isHost && !m.isHost ? `<span class="kick" onclick="kickMember('${m.openid}')">移除</span>` : ''}
+        </div>`).join('')}
+    </div>
+
+    <div class="section-head">简单聊天</div>
+    <div class="card chat-card">
+      ${isMember
+        ? `<div class="messages" id="msgBox">
+            ${r.messages.length ? r.messages.map(m => `<div class="message"><span class="message-name">${m.name}</span>${m.text}</div>`).join('') : '<div class="empty-chat">说点什么，喊大家准备上号吧</div>'}
+          </div>
+          <div class="chat-input">
+            <input id="chatInput" placeholder="输入消息" maxlength="200" onkeydown="if(event.key==='Enter')sendMsg()" />
+            <button class="btn" onclick="sendMsg()">发送</button>
+          </div>`
+        : `<div class="empty-chat">加入房间后才能看聊天、一起畅聊</div>
+           <div class="lock-tip">🔒 聊什么，得先进房间</div>`}
+    </div>
+
+    <div class="actions">
+      ${isHost
+        ? `<button class="btn btn-primary" onclick="toggleReady()">${myReady ? '取消准备' : '房主已准备'}</button>
+           ${r.status === 'pending' ? '<button class="btn btn-green" onclick="startRoom()">开始游戏</button>' : ''}
+           <button class="btn btn-danger" onclick="dissolveRoom()">解散房间</button>`
+        : (isMember
+          ? `<button class="btn btn-primary" onclick="toggleReady()">${myReady ? '取消准备' : '我准备好了'}</button>
+             <button class="btn btn-secondary" onclick="leaveRoom()">退出房间</button>`
+          : `<button class="btn btn-primary" onclick="joinRoom()">加入房间</button>
+             <button class="btn btn-secondary" onclick="goBackHome()">返回</button>`)}
+      <button class="btn btn-secondary" onclick="goBackHome()">返回首页</button>
+    </div>`;
+  document.getElementById('roomBody').innerHTML = body;
+  const box = document.getElementById('msgBox');
+  if (box) box.scrollTop = box.scrollHeight;
+}
+function updateRoomStatus(r) {
+  if (r.status === 'dissolved') return false;
+  if (r.status === 'ready') return false;
+  const allReady = r.members.length >= 2 && r.members.every(m => m.ready);
+  r.status = allReady ? 'pending' : (r.members.length >= r.maxPlayers ? 'full' : 'recruiting');
+  r.updatedAt = Date.now();
+  return false;
+}
+function toggleReady() {
+  const r = findRoom(state.currentRoomId);
+  const me = r.members.find(m => m.openid === 'me');
+  if (!me) return;
+  me.ready = !me.ready;
+  updateRoomStatus(r);
+  save();
+  renderRoom();
+}
+function startRoom() {
+  const r = findRoom(state.currentRoomId);
+  if (r.status !== 'pending') return;
+  r.status = 'ready';
+  r.updatedAt = Date.now();
+  save();
+  toast('已开始，通知队友');
+  renderRoom();
+}
+function joinRoom() {
+  const r = findRoom(state.currentRoomId);
+  if (r.status === 'ready') return toast('队友已全部准备，可以开打了');
+  if (r.status === 'full' || r.members.length >= r.maxPlayers) return toast('房间已满，下次早点来');
+  r.members.push({ openid: 'me', name: state.myNickname || '我', isHost: false, ready: false });
+  updateRoomStatus(r);
+  save();
+  toast('已加入房间');
+  switchTab('home');
+  renderHome();
+}
+function leaveRoom() {
+  const r = findRoom(state.currentRoomId);
+  r.members = r.members.filter(m => m.openid !== 'me');
+  updateRoomStatus(r);
+  save(); toast('已退出房间'); goBackHome();
+}
+function kickMember(openid) {
+  const r = findRoom(state.currentRoomId);
+  r.members = r.members.filter(m => m.openid !== openid);
+  updateRoomStatus(r);
+  save(); renderRoom();
+}
+function dissolveRoom() {
+  const r = findRoom(state.currentRoomId);
+  r.status = 'dissolved';
+  save(); toast('房间已解散'); goBackHome();
+}
+function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const r = findRoom(state.currentRoomId);
+  r.messages.push({ name: state.myNickname || '我', text });
+  input.value = '';
+  save(); renderRoom();
+}
+
+// ===== 我的 =====
+function saveProfile() {
+  const v = document.getElementById('pNickname').value.trim();
+  if (!v) return toast('请填写游戏昵称');
+  state.myNickname = v;
+  save(); toast('已保存');
+}
+
+let currentTab = 'home';
+let touchStartX = 0;
+let touchStartY = 0;
+const TABS = ['home', 'create', 'room', 'profile'];
+function switchTab(name, options = {}) {
+  const titles = { home: '上号吧', create: '发起上号', room: '房间详情', profile: '我的' };
+  const previousTab = currentTab;
+  currentTab = TABS.includes(name) ? name : 'home';
+  if (!options.skipHistory && previousTab !== currentTab) {
+    window.history.pushState({ demoTab: currentTab }, '', '#' + currentTab);
+  }
+  document.getElementById('navTitleText').textContent = titles[currentTab];
+  document.getElementById('navBack').classList.toggle('hide', currentTab === 'home');
+  TABS.forEach(t => document.getElementById('view-' + t).classList.toggle('hide', t !== currentTab));
+  const tabHome = document.getElementById('tabHome');
+  const tabProfile = document.getElementById('tabProfile');
+  tabHome.classList.toggle('active', currentTab === 'home');
+  tabProfile.classList.toggle('active', currentTab === 'profile');
+  if (currentTab === 'home') {
+    state.currentRoomId = null;
+    renderHome();
+  }
+  if (currentTab === 'profile') document.getElementById('pNickname').value = state.myNickname;
+  window.scrollTo(0, 0);
+}
+function goBack() {
+  if (currentTab === 'home') return;
+  if (window.history.state && window.history.state.demoTab) window.history.back();
+  else switchTab('home', { skipHistory: true });
+}
+function goBackHome() {
+  state.currentRoomId = null;
+  // 房间/发起页可能叠加在历史栈中间，返回首页要直接落到 home，
+  // 不回退到「发起上号」等中间页。
+  switchTab('home', { skipHistory: false });
+  if (window.history.state && window.history.state.demoTab !== 'home') {
+    window.history.replaceState({ demoTab: 'home' }, '', '#home');
+  }
+}
+window.addEventListener('popstate', () => {
+  const name = window.location.hash.slice(1);
+  switchTab(TABS.includes(name) ? name : 'home', { skipHistory: true });
+});
+window.addEventListener('touchstart', event => {
+  const touch = event.changedTouches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+}, { passive: true });
+window.addEventListener('touchend', event => {
+  const touch = event.changedTouches[0];
+  const deltaX = touch.clientX - touchStartX;
+  const deltaY = Math.abs(touch.clientY - touchStartY);
+  if (touchStartX <= 32 && deltaX >= 72 && deltaY <= 80 && currentTab !== 'home') goBack();
+}, { passive: true });
+window.history.replaceState({ demoTab: 'home' }, '', '#home');
+
+// ===== 启动 =====
+load();
+renderHome();
+</script>
+</body>
+</html>

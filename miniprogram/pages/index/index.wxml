@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="hero">
+    <view class="page-title">上号吧</view>
+    <view class="page-subtitle">喊一声，朋友就位</view>
+    <button class="primary-button" bindtap="goCreate">+ 发起上号</button>
+  </view>
+
+  <view wx:if="{{myRooms.length}}" class="my-rooms-section">
+    <view class="section-head"><text>我的房间</text><text class="muted">{{myRooms.length}} 间</text></view>
+    <view class="card room-card my-room-card" wx:for="{{myRooms}}" wx:key="_id" bindtap="openRoom" data-id="{{item._id}}">
+      <view class="room-top"><text class="game-name">{{item.game}}</text><text class="role-badge">{{item.roleText}}</text></view>
+      <view class="room-mode">{{item.mode || '一起开黑'}}</view>
+      <view class="room-bottom"><text>{{item.memberCount}} / {{item.maxPlayers}} 人</text><text class="muted">{{item.startTimeLabel}}</text></view>
+      <view class="my-room-status">{{item.statusText}}</view>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text>正在召集</text>
+    <text class="muted" bindtap="refresh">刷新</text>
+  </view>
+
+  <view wx:if="{{rooms.length}}">
+    <view class="card room-card" wx:for="{{rooms}}" wx:key="_id" bindtap="openRoom" data-id="{{item._id}}">
+      <view class="room-top">
+        <text class="game-name">{{item.game}}</text>
+        <text class="room-status">{{item.statusText}}</text>
+      </view>
+      <view class="room-mode">{{item.mode}}</view>
+      <view class="room-bottom">
+        <text>{{item.memberCount}} / {{item.maxPlayers}} 人</text>
+        <text class="muted">{{item.startTimeLabel}}</text>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="empty">暂时没有正在召集的房间<br/>发起一局，喊朋友上号吧</view>
+
+  <view class="tabbar">
+    <view class="tab active">首页</view>
+    <view class="tab" bindtap="goProfile">我的</view>
+  </view>
+</view>

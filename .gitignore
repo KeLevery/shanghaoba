@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Coverage / test artifacts
+coverage/
+.nyc_output/
+
+# Build / cache
+.cache/
+dist/
+.tmp/
+*.log
+
+# 微信开发者工具本地私有配置（含本地编译/调试设置，不应入库）
+project.private.config.json
+
+# 环境与密钥
+.env
+.env.*
+*.local
+*.pem
+*.key
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 截图等本地资源（如需入库请自行移除该行）
+shots/
+
+# AI 工具链 / 工作流本地配置（仅本机使用，不应入库）
+.claude/
+.cursor/
+.trellis/

@@ -1,0 +1,14 @@
+{
+  "name": "shanghaoba-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "上号吧小程序 · 单元测试工程（云函数 + 页面逻辑）",
+  "scripts": {
+    "test": "jest",
+    "test:cloud": "jest tests/cloudfunctions",
+    "test:miniprogram": "jest tests/miniprogram"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

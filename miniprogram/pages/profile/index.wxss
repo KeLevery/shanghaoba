@@ -1,0 +1,1 @@
+.field-label { margin-bottom: 18rpx; font-weight: 600; }.card input { height: 82rpx; padding: 0 20rpx; box-sizing: border-box; border-radius: 12rpx; background: #f5f6f8; text-align: left; }.save { margin-top: 28rpx; }.privacy { display: flex; flex-direction: column; gap: 16rpx; color: #596170; }.privacy text { font-size: 25rpx; line-height: 1.7; color: #8a919e; }
