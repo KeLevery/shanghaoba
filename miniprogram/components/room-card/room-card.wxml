@@ -1,0 +1,39 @@
+<!-- ============================================================
+  room-card 房间卡片（参考图样式）
+  左封面 | 标题(游戏·模式) + meta(时间·备注) | 右计分 + 加入/状态
+  properties:
+    roomId / game / mode / startTimeLabel / memberCount / maxPlayers
+    status / remark / roleText（我的房间角色标，空不展示）
+  events:
+    tap  detail: { roomId }
+============================================================ -->
+<view
+  class="room-card {{isFull ? 'room-card--full' : ''}}"
+  hover-class="room-card--hover"
+  bindtap="onTap"
+>
+  <!-- 封面（缺图时 game-cover 降级为游戏色块 + 首字） -->
+  <view class="room-card__cover">
+    <game-cover game="{{game}}" />
+  </view>
+
+  <view class="room-card__main">
+    <view class="room-card__title-row">
+      <text class="room-card__title">{{game}}</text>
+      <text wx:if="{{mode}}" class="room-card__mode">· {{mode}}</text>
+      <text wx:if="{{roleText === '房主'}}" class="room-card__role">房主</text>
+    </view>
+    <view class="room-card__meta">
+      <text class="room-card__time">{{startTimeLabel}}</text>
+      <text wx:if="{{remark}}" class="room-card__remark"> · {{remark}}</text>
+    </view>
+  </view>
+
+  <view class="room-card__side">
+    <view class="room-card__count num">{{memberCount}}<text class="room-card__count-max">/{{maxPlayers}}</text></view>
+    <!-- 未满员：青柠绿「加入」胶囊；满员：灰胶囊；其他状态：状态点标签 -->
+    <view wx:if="{{status === 'recruiting' || status === 'pending'}}" class="room-card__join">加入</view>
+    <view wx:elif="{{isFull}}" class="room-card__join room-card__join--full">已满员</view>
+    <view wx:else class="tagdot {{status === 'pending' ? 'tagdot--pending' : (status === 'dissolved' ? 'tagdot--gray' : '')}}">{{statusText}}</view>
+  </view>
+</view>

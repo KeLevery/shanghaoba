@@ -3,11 +3,10 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
+const { STATUS, STATUS_TEXT } = require('./_shared/constants');
 
 function statusTextOf(status) {
-  const map = { recruiting: '招募中', full: '已满', pending: '待房主开始', ready: '全员就绪 · 可以开打', dissolved: '已解散' };
-  return map[status] || status;
+  return STATUS_TEXT[status] || status;
 }
 
 function buildRoomInfo(roomDoc, participantCount) {

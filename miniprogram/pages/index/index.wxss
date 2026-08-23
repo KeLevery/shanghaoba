@@ -1,16 +1,123 @@
-.my-rooms-section { margin-bottom: 24rpx; }
-  .my-room-card { position: relative; border: 2rpx solid #263240; }
-  .role-badge { color: #263240; background: #eef0f3; border-radius: 8rpx; padding: 8rpx 12rpx; font-size: 22rpx; }
-  .my-room-status { margin-top: 18rpx; color: #2c9c68; font-size: 24rpx; }
-  .my-room-card:active { background: #f7f8fa; }
+@import '../../styles/tokens.wxss';
+@import '../../styles/common.wxss';
 
-.section-head { display: flex; justify-content: space-between; font-size: 32rpx; font-weight: 600; margin: 18rpx 4rpx; }
-.room-card { padding: 28rpx; }
-.room-top, .room-bottom { display: flex; justify-content: space-between; align-items: center; }
-.game-name { font-size: 34rpx; font-weight: 600; }
-.room-status { color: #2c9c68; background: #eaf8f0; border-radius: 8rpx; padding: 8rpx 14rpx; font-size: 24rpx; }
-.room-mode { margin: 20rpx 0; color: #596170; }
-.room-bottom { font-size: 25rpx; }
-.tabbar { position: fixed; bottom: 0; left: 0; right: 0; height: 110rpx; background: #fff; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4rpx 20rpx rgba(0,0,0,.05); }
-.tab { color: #9aa1ac; font-size: 26rpx; }
-.tab.active { color: #20242d; font-weight: 600; }
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: 40rpx;
+  background: var(--shb-bg-page);
+}
+
+/* 底部留白：为自定义 TabBar（含凸起按钮）让位 */
+.page-tail {
+  height: 200rpx;
+}
+
+/* ---- 页眉：大标题 + 铃铛 ---- */
+.apphead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 36rpx 0;
+}
+
+.apphead__title {
+  font-size: var(--shb-fs-xxl);
+  font-weight: var(--shb-fw-bold);
+  letter-spacing: 2rpx;
+  color: var(--shb-text-primary);
+}
+
+/* 铃铛：深色圆底 + 线性铃身 + 青柠绿角标点 */
+.bell {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
+  background: var(--shb-bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.bell--hover {
+  opacity: 0.75;
+}
+
+.bell__body {
+  width: 26rpx;
+  height: 26rpx;
+  border: 4rpx solid #aab4c0;
+  border-bottom: none;
+  border-radius: 14rpx 14rpx 4rpx 4rpx;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.bell__body::before {
+  content: '';
+  position: absolute;
+  left: 4rpx;
+  top: 22rpx;
+  width: 10rpx;
+  height: 4rpx;
+  background: #aab4c0;
+  border-radius: var(--shb-radius-sm);
+}
+
+.bell__body::after {
+  content: '';
+  position: absolute;
+  left: 7rpx;
+  top: 28rpx;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #aab4c0;
+}
+
+.bell__dot {
+  position: absolute;
+  top: 10rpx;
+  right: 12rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: var(--shb-color-primary);
+  border: 4rpx solid var(--shb-bg-card);
+  box-sizing: content-box;
+}
+
+/* ---- 胶囊筛选横滑 ---- */
+.chips-row {
+  white-space: nowrap;
+  padding: 32rpx 36rpx 28rpx;
+  box-sizing: border-box;
+}
+
+.chips-row .pill {
+  display: inline-flex;
+  margin-right: 20rpx;
+}
+
+/* ---- 分区头 ---- */
+.sec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36rpx 36rpx 24rpx;
+}
+
+.sec__count {
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-text-tertiary);
+  font-weight: var(--shb-fw-medium);
+}
+
+/* ---- 房间卡片列表 ---- */
+.rooms {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 0 36rpx;
+}

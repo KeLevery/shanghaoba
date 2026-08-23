@@ -1,0 +1,15 @@
+<!-- game-cover：有图显图，缺图降级为渐变品牌色 + 首字徽章 -->
+<view class="game-cover">
+  <image
+    wx:if="{{src && !failed}}"
+    class="game-cover__img"
+    src="{{src}}"
+    mode="aspectFill"
+    binderror="onError"
+  />
+  <view wx:else class="game-cover__fallback" style="background: {{bg}};">
+    <view class="game-cover__badge">
+      <text class="game-cover__initial">{{initial}}</text>
+    </view>
+  </view>
+</view>

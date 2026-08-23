@@ -3,7 +3,7 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
+const { STATUS } = require('./_shared/constants');
 
 exports.main = async (event) => {
   const openid = cloud.getWXContext().OPENID;
@@ -30,16 +30,18 @@ exports.main = async (event) => {
   }
 
   const now = Date.now();
+  // 状态回退：full/pending/ready 房间退出后不再满员（或本为 ready）时回落 recruiting；
+  // 无论是否回退，退出本身都算活跃行为，统一刷新 updatedAt/lastActiveAt。
+  let statusPatch = null;
   if (roomDoc.status === STATUS.FULL || roomDoc.status === STATUS.PENDING || roomDoc.status === STATUS.READY) {
     const current = await db.collection('participants').where({ roomId }).count();
     if (roomDoc.status === STATUS.READY || current.total < roomDoc.maxPlayers) {
-      await db.collection('rooms').doc(roomId).update({
-        data: { status: STATUS.RECRUITING, updatedAt: now, allReadyAt: null, readyNotificationStatus: null }
-      });
+      statusPatch = { status: STATUS.RECRUITING, allReadyAt: null, readyNotificationStatus: null };
     }
-  } else {
-    await db.collection('rooms').doc(roomId).update({ data: { updatedAt: now } });
   }
+  await db.collection('rooms').doc(roomId).update({
+    data: Object.assign({ updatedAt: now, lastActiveAt: now }, statusPatch)
+  });
 
   return { left: true };
 };

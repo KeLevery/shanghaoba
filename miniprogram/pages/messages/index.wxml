@@ -1,0 +1,50 @@
+<!-- ============================================================
+  消息页（参考图样式）：我的房间 × 最近一条消息，封面卡片式
+============================================================ -->
+<view class="page">
+
+  <view class="pagehead">消息</view>
+
+  <!-- 加载态 -->
+  <view wx:if="{{loading && !items.length}}" class="loading num">···</view>
+
+  <!-- 消息卡片列表 -->
+  <view wx:elif="{{items.length}}" class="mlist">
+    <view
+      wx:for="{{items}}"
+      wx:key="roomId"
+      class="mrow"
+      hover-class="mrow--hover"
+      data-room-id="{{item.roomId}}"
+      bindtap="onItemTap"
+    >
+      <view class="mrow__cover">
+        <game-cover game="{{item.game}}" />
+      </view>
+      <view class="mrow__main">
+        <view class="mrow__top">
+          <text class="mrow__title">{{item.game}}</text>
+          <text wx:if="{{item.mode}}" class="mrow__mode">· {{item.mode}}</text>
+          <text wx:if="{{item.lastTime}}" class="mrow__time num">{{item.lastTime}}</text>
+        </view>
+        <view class="mrow__preview {{item.lastContent ? '' : 'mrow__preview--empty'}}">
+          <text wx:if="{{item.lastContent}}">{{item.lastSender}}：{{item.lastContent}}</text>
+          <text wx:else>还没有消息，去喊一嗓子</text>
+        </view>
+      </view>
+      <view class="mrow__side">
+        <view class="mrow__count num">{{item.memberCount}}<text class="mrow__count-max">/{{item.maxPlayers}}</text></view>
+        <status-tag status="{{item.status}}" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 空态 -->
+  <empty-state
+    wx:else
+    title="暂无消息"
+    description="加入房间后，队友的留言会出现在这里"
+  />
+
+  <view class="page-tail"></view>
+</view>

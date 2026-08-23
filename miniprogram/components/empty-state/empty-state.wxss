@@ -1,0 +1,66 @@
+@import '../../styles/tokens.wxss';
+@import '../../styles/common.wxss';
+
+/* 宿主节点块级化 */
+:host {
+  display: block;
+}
+
+.empty-state {
+  margin: 48rpx 36rpx;
+  padding: 96rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--shb-bg-card);
+  border-radius: var(--shb-radius-lg);
+}
+
+/* 青柠绿软底圆记号 + ＋ */
+.empty-state__mark {
+  width: 112rpx;
+  height: 112rpx;
+  margin-bottom: 28rpx;
+  border-radius: 50%;
+  background: var(--shb-color-primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  font-weight: 800;
+  color: var(--shb-color-primary);
+}
+
+.empty-state__mark::after {
+  content: '+';
+}
+
+.empty-state__title {
+  font-size: var(--shb-fs-base);
+  font-weight: var(--shb-fw-bold);
+  color: #d7dee6;
+}
+
+.empty-state__desc {
+  margin-top: 12rpx;
+  font-size: var(--shb-fs-sm);
+  color: var(--shb-text-secondary);
+}
+
+.empty-state__btn {
+  margin-top: 36rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 48rpx;
+  border-radius: var(--shb-radius-full);
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  font-size: var(--shb-fs-base);
+  font-weight: var(--shb-fw-bold);
+  letter-spacing: 2rpx;
+}
+
+.empty-state__btn--hover {
+  opacity: 0.8;
+}

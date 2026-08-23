@@ -1,0 +1,13 @@
+<!-- empty-state 空状态：虚线方框记号 + 主文案 + 辅助说明 + 可选按钮 -->
+<view class="empty-state">
+  <view class="empty-state__mark"></view>
+  <text class="empty-state__title">{{title}}</text>
+  <text wx:if="{{description}}" class="empty-state__desc">{{description}}</text>
+  <slot></slot>
+  <view
+    wx:if="{{buttonText}}"
+    class="empty-state__btn"
+    hover-class="empty-state__btn--hover"
+    bindtap="onAction"
+  >{{buttonText}} →</view>
+</view>

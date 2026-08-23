@@ -1,0 +1,106 @@
+@import '../../styles/tokens.wxss';
+
+/* 宿主节点块级化 */
+:host {
+  display: block;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 22rpx 0;
+  border-top: 2rpx solid var(--shb-hairline);
+}
+
+/* 圆形头像 */
+.member__ava {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: var(--shb-bg-elev);
+  color: #cfd6de;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: var(--shb-fw-bold);
+  flex-shrink: 0;
+}
+
+.member__ava--on {
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+}
+
+.member__name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.member__name-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--shb-fs-base);
+  font-weight: var(--shb-fw-medium);
+  color: var(--shb-text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.member__role {
+  flex-shrink: 0;
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-color-pending);
+  border: 2rpx solid rgba(255, 178, 36, 0.5);
+  padding: 2rpx 12rpx;
+  border-radius: var(--shb-radius-full);
+}
+
+.member__state {
+  flex-shrink: 0;
+  font-size: var(--shb-fs-sm);
+  color: var(--shb-text-tertiary);
+}
+
+.member__state--on {
+  color: var(--shb-color-primary);
+  font-weight: var(--shb-fw-bold);
+}
+
+.member__kick {
+  flex-shrink: 0;
+  padding: 4rpx 12rpx;
+  font-size: var(--shb-fs-base);
+  color: var(--shb-color-danger);
+}
+
+.member__kick--hover {
+  opacity: 0.6;
+}
+
+/* 空位占位行 */
+.member--empty {
+  color: var(--shb-text-tertiary);
+  font-size: var(--shb-fs-sm);
+}
+
+.member--empty .member__ava {
+  background: transparent;
+  border: 2rpx dashed var(--shb-hairline-strong);
+  color: var(--shb-text-tertiary);
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.member__empty-text {
+  color: var(--shb-text-tertiary);
+}
+
+.member--empty .num {
+  font-weight: var(--shb-fw-medium);
+}

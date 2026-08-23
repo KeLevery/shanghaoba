@@ -3,7 +3,7 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
+const { STATUS } = require('./_shared/constants');
 
 exports.main = async (event) => {
   const openid = cloud.getWXContext().OPENID;
@@ -31,24 +31,38 @@ exports.main = async (event) => {
     throw new Error('房间已满，下次早点来');
   }
 
-  // 先写入参与者；并发下可能与另一请求竞争同一名额，靠下面的二次校验 + 补偿删除兜底，
+  // 先写入参与者；并发下可能与另一请求竞争同一名额，靠下面的二次校验 + 确定性补偿删除兜底，
   // 避免出现成员数超过 maxPlayers 的超员状态。
   const now = Date.now();
   const added = await db.collection('participants').add({
     data: { roomId, openid, isHost: false, ready: false, createdAt: now }
   });
 
+  let full;
   const after = await db.collection('participants').where({ roomId }).count();
   if (after.total > roomDoc.maxPlayers) {
-    // 并发超员：补偿删除刚加入的参与者，避免成员超过上限
-    await db.collection('participants').doc(added._id).remove();
-    await db.collection('rooms').doc(roomId).update({ data: { status: STATUS.FULL, updatedAt: now } });
-    throw new Error('房间已满，下次早点来');
+    // 并发超员：删除前再次拉取有序名单确认仍超员。名额按加入先后（createdAt 升序）分配，
+    // 仅当自己那条记录排在名额之外时，才按 _id 补偿删除自己刚写入的记录；
+    // 名次在名额之内则加入有效，由名次靠后的并发请求自行退出，保证不误删合法成员。
+    const ordered = await db.collection('participants')
+      .where({ roomId })
+      .orderBy('createdAt', 'asc')
+      .get();
+    const myRank = ordered.data.findIndex((p) => p._id === added._id);
+    if (myRank >= roomDoc.maxPlayers) {
+      await db.collection('participants').doc(added._id).remove();
+      await db.collection('rooms').doc(roomId).update({
+        data: { status: STATUS.FULL, updatedAt: Date.now() }
+      });
+      throw new Error('房间已满，下次早点来');
+    }
+    full = true; // 已超员且自己在名额之内：房间必定已满
+  } else {
+    full = after.total >= roomDoc.maxPlayers;
   }
 
-  const full = after.total >= roomDoc.maxPlayers;
   await db.collection('rooms').doc(roomId).update({
-    data: { status: full ? STATUS.FULL : STATUS.RECRUITING, updatedAt: now }
+    data: { status: full ? STATUS.FULL : STATUS.RECRUITING, updatedAt: now, lastActiveAt: now }
   });
 
   return { joined: true };

@@ -1,0 +1,11 @@
+<!-- chat-bubble 聊天气泡：isSelf=右侧墨色反白，否则左侧纸底描边 -->
+<view class="chat-bubble {{isSelf ? 'chat-bubble--self' : ''}}">
+  <!-- 元信息：昵称 + 等宽时间 -->
+  <view class="chat-bubble__meta">
+    <text wx:if="{{!isSelf && displayName}}" class="chat-bubble__name">{{displayName}}</text>
+    <text wx:if="{{timeText}}" class="chat-bubble__time num">{{timeText}}</text>
+  </view>
+
+  <!-- 气泡正文 -->
+  <view class="chat-bubble__content">{{content}}</view>
+</view>

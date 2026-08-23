@@ -1,0 +1,129 @@
+@import '../../styles/tokens.wxss';
+@import '../../styles/common.wxss';
+
+/* 宿主节点块级化，保证列表内占满一行 */
+:host {
+  display: block;
+}
+
+.room-card {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  background: var(--shb-bg-card);
+  border-radius: var(--shb-radius-lg);
+  padding: 28rpx;
+}
+
+.room-card--hover {
+  background: var(--shb-bg-elev);
+}
+
+.room-card--full {
+  opacity: 0.7;
+}
+
+.room-card__cover {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: var(--shb-radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.room-card__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.room-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.room-card__title {
+  font-size: var(--shb-fs-base);
+  font-weight: var(--shb-fw-bold);
+  color: var(--shb-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.room-card__mode {
+  font-size: var(--shb-fs-sm);
+  font-weight: var(--shb-fw-medium);
+  color: var(--shb-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.room-card__role {
+  flex-shrink: 0;
+  font-size: var(--shb-fs-xs);
+  font-weight: var(--shb-fw-bold);
+  color: var(--shb-color-pending);
+  border: 2rpx solid rgba(255, 178, 36, 0.5);
+  padding: 2rpx 12rpx;
+  border-radius: var(--shb-radius-full);
+}
+
+.room-card__meta {
+  margin-top: 10rpx;
+  font-size: var(--shb-fs-sm);
+  color: var(--shb-text-secondary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.room-card__time {
+  color: #d7dee6;
+  font-weight: var(--shb-fw-medium);
+}
+
+.room-card__remark {
+  color: var(--shb-text-secondary);
+}
+
+.room-card__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14rpx;
+  flex-shrink: 0;
+}
+
+.room-card__count {
+  font-size: var(--shb-fs-lg);
+  color: var(--shb-text-primary);
+}
+
+.room-card__count-max {
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-text-tertiary);
+  font-weight: var(--shb-fw-medium);
+}
+
+/* 加入胶囊：青柠绿填充深字 */
+.room-card__join {
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+  border-radius: var(--shb-radius-full);
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  font-size: var(--shb-fs-sm);
+  font-weight: var(--shb-fw-bold);
+  letter-spacing: 2rpx;
+}
+
+.room-card__join--full {
+  background: var(--shb-bg-chip);
+  color: var(--shb-text-tertiary);
+}

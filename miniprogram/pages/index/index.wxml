@@ -1,42 +1,83 @@
-<view class="container">
-  <view class="hero">
-    <view class="page-title">上号吧</view>
-    <view class="page-subtitle">喊一声，朋友就位</view>
-    <button class="primary-button" bindtap="goCreate">+ 发起上号</button>
-  </view>
+<!-- ============================================================
+  招募大厅（参考图样式）
+  页眉大标题 + 铃铛 → 胶囊筛选 chips → 我的房间 → 正在召集
+============================================================ -->
+<view class="page">
 
-  <view wx:if="{{myRooms.length}}" class="my-rooms-section">
-    <view class="section-head"><text>我的房间</text><text class="muted">{{myRooms.length}} 间</text></view>
-    <view class="card room-card my-room-card" wx:for="{{myRooms}}" wx:key="_id" bindtap="openRoom" data-id="{{item._id}}">
-      <view class="room-top"><text class="game-name">{{item.game}}</text><text class="role-badge">{{item.roleText}}</text></view>
-      <view class="room-mode">{{item.mode || '一起开黑'}}</view>
-      <view class="room-bottom"><text>{{item.memberCount}} / {{item.maxPlayers}} 人</text><text class="muted">{{item.startTimeLabel}}</text></view>
-      <view class="my-room-status">{{item.statusText}}</view>
+  <!-- 页眉：大标题 + 铃铛 -->
+  <view class="apphead">
+    <text class="apphead__title">招募大厅</text>
+    <view class="bell" hover-class="bell--hover" bindtap="onBellTap">
+      <view class="bell__body"></view>
+      <view class="bell__dot"></view>
     </view>
   </view>
 
-  <view class="section-head">
-    <text>正在召集</text>
-    <text class="muted" bindtap="refresh">刷新</text>
-  </view>
+  <!-- 游戏筛选胶囊 -->
+  <scroll-view class="chips-row" scroll-x enhanced show-scrollbar="{{false}}">
+    <view
+      wx:for="{{gameTabs}}"
+      wx:key="*this"
+      class="pill {{activeGameIndex === index ? 'pill--active' : ''}}"
+      data-index="{{index}}"
+      hover-class="pill--hover"
+      bindtap="onGameTabTap"
+    >{{item}}</view>
+  </scroll-view>
 
-  <view wx:if="{{rooms.length}}">
-    <view class="card room-card" wx:for="{{rooms}}" wx:key="_id" bindtap="openRoom" data-id="{{item._id}}">
-      <view class="room-top">
-        <text class="game-name">{{item.game}}</text>
-        <text class="room-status">{{item.statusText}}</text>
-      </view>
-      <view class="room-mode">{{item.mode}}</view>
-      <view class="room-bottom">
-        <text>{{item.memberCount}} / {{item.maxPlayers}} 人</text>
-        <text class="muted">{{item.startTimeLabel}}</text>
-      </view>
+  <!-- 我的房间（仅在有数据时出现） -->
+  <block wx:if="{{filteredMyRooms.length}}">
+    <view class="sec">
+      <view class="sec-title">我的房间</view>
+      <text class="sec__count num">{{filteredMyRooms.length}} 个</text>
     </view>
-  </view>
-  <view wx:else class="empty">暂时没有正在召集的房间<br/>发起一局，喊朋友上号吧</view>
+    <view class="rooms">
+      <room-card
+        wx:for="{{filteredMyRooms}}"
+        wx:key="_id"
+        roomId="{{item._id}}"
+        game="{{item.game}}"
+        mode="{{item.mode}}"
+        startTimeLabel="{{item.startTimeLabel}}"
+        memberCount="{{item.memberCount || 0}}"
+        maxPlayers="{{item.maxPlayers}}"
+        status="{{item.status}}"
+        remark="{{item.remark}}"
+        roleText="{{item.roleText}}"
+        bind:tap="onRoomTap"
+      />
+    </view>
+  </block>
 
-  <view class="tabbar">
-    <view class="tab active">首页</view>
-    <view class="tab" bindtap="goProfile">我的</view>
+  <!-- 正在召集 -->
+  <view class="sec">
+    <view class="sec-title">正在召集</view>
+    <text wx:if="{{filteredRooms.length}}" class="sec__count num">{{filteredRooms.length}} 个房间</text>
   </view>
+
+  <view wx:if="{{filteredRooms.length}}" class="rooms">
+    <room-card
+      wx:for="{{filteredRooms}}"
+      wx:key="_id"
+      roomId="{{item._id}}"
+      game="{{item.game}}"
+      mode="{{item.mode}}"
+      startTimeLabel="{{item.startTimeLabel}}"
+      memberCount="{{item.memberCount || 0}}"
+      maxPlayers="{{item.maxPlayers}}"
+      status="{{item.status}}"
+      remark="{{item.remark}}"
+      bind:tap="onRoomTap"
+    />
+  </view>
+  <empty-state
+    wx:else
+    title="现在没有人在召集"
+    description="发起一个房间，把链接甩进群里"
+    buttonText="发起上号"
+    bind:action="goCreate"
+  />
+
+  <!-- 底部留白（自定义 TabBar 让位） -->
+  <view class="page-tail"></view>
 </view>

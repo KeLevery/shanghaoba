@@ -1,0 +1,38 @@
+<!-- ============================================================
+  member-item 成员行（参考图样式：圆形头像，已准备=青柠绿）
+  properties:
+    openid / displayName / isHost / ready / canRemove / isEmpty / slotIndex
+  events:
+    remove  detail: { openid }  点击移除按钮
+============================================================ -->
+<!-- 空位占位行 -->
+<view wx:if="{{isEmpty}}" class="member member--empty">
+  <view class="member__ava">＋</view>
+  <text class="member__empty-text">空位 <text class="num">{{slotIndex}}</text> · 等待加入</text>
+</view>
+
+<!-- 成员行 -->
+<view wx:else class="member">
+  <!-- 圆形头像：已准备时青柠绿底深字 -->
+  <view class="member__ava {{ready ? 'member__ava--on' : ''}}">
+    <text>{{avatarText}}</text>
+  </view>
+
+  <view class="member__name">
+    <text class="member__name-text">{{displayName || '神秘玩家'}}</text>
+    <text wx:if="{{isHost}}" class="member__role">房主</text>
+  </view>
+
+  <!-- 右侧准备状态 -->
+  <view class="member__state {{ready ? 'member__state--on' : ''}}">
+    {{ready ? '已准备' : '未准备'}}
+  </view>
+
+  <!-- 移除（房主视角且非房主本人） -->
+  <view
+    wx:if="{{canRemove && !isHost}}"
+    class="member__kick"
+    hover-class="member__kick--hover"
+    catchtap="onRemove"
+  >×</view>
+</view>

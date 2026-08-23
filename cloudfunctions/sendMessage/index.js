@@ -3,12 +3,13 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
+const { STATUS, CONTENT_MAX_LENGTH } = require('./_shared/constants');
+const { trimAndSlice } = require('./_shared/validate');
 
 exports.main = async (event) => {
   const openid = cloud.getWXContext().OPENID;
   const roomId = event.roomId;
-  const content = String(event.content || '').trim().slice(0, 200);
+  const content = trimAndSlice(event.content, CONTENT_MAX_LENGTH);
   if (!roomId) throw new Error('缺少房间 ID');
   if (!content) throw new Error('消息不能为空');
 
@@ -28,7 +29,7 @@ exports.main = async (event) => {
   const added = await db.collection('messages').add({
     data: { roomId, openid, content, createdAt: now }
   });
-  await db.collection('rooms').doc(roomId).update({ data: { updatedAt: now } });
+  await db.collection('rooms').doc(roomId).update({ data: { updatedAt: now, lastActiveAt: now } });
 
   return { messageId: added._id };
 };

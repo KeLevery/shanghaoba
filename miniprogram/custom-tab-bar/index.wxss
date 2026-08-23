@@ -1,0 +1,89 @@
+@import '../styles/tokens.wxss';
+
+/* 自定义 tabBar 由框架渲染在页面文档流末尾，必须自行固定在底部，
+   否则会随页面内容滚动（长页面上 tabBar 被顶到页面最底部） */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  background: #0d151d;
+  border-top: 2rpx solid var(--shb-hairline);
+}
+
+.tabbar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 0 20rpx;
+  color: var(--shb-text-tertiary);
+}
+
+.tabbar__item--hover {
+  opacity: 0.75;
+}
+
+.tabbar__item--active {
+  color: var(--shb-color-primary);
+}
+
+.tabbar__text {
+  font-size: var(--shb-fs-xs);
+  letter-spacing: 1rpx;
+}
+
+.tabbar__item--active .tabbar__text {
+  font-weight: var(--shb-fw-bold);
+}
+
+/* ---- 图标（SVG 图片，尺寸统一） ---- */
+.tabbar__icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+/* ---- 凸起青柠绿＋按钮 ---- */
+.tabbar__item--fab {
+  padding-top: 0;
+}
+
+.tabbar__fab {
+  width: 112rpx;
+  height: 112rpx;
+  margin-top: -60rpx;
+  border-radius: 50%;
+  background: var(--shb-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 20rpx 48rpx rgba(192, 232, 99, 0.28);
+  position: relative;
+}
+
+/* ＋ 号：两根圆角横竖条 */
+.tabbar__fab-plus {
+  width: 44rpx;
+  height: 8rpx;
+  border-radius: var(--shb-radius-sm);
+  background: var(--shb-text-inverse);
+}
+.tabbar__fab-plus::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8rpx;
+  height: 44rpx;
+  border-radius: var(--shb-radius-sm);
+  background: var(--shb-text-inverse);
+}
+
+.tabbar__item--fab .tabbar__text {
+  margin-top: 4rpx;
+}

@@ -1,0 +1,2 @@
+<!-- status-tag 状态标：recruiting/full/pending/ready/dissolved -->
+<view class="status-tag status-tag--{{modifier}}">{{text}}</view>

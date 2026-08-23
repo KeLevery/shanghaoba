@@ -1,0 +1,72 @@
+/* ============================================================
+ * tokens.wxss — 上号吧设计系统（按用户参考图还原）
+ *
+ * 视觉语言：深蓝黑底 + 青柠绿主色（#C0E863，降荧光提可读）。
+ * 电竞感深色界面：胶囊筛选、封面卡片、底部凸起＋按钮。
+ * 主色上文字用 --shb-lime-ink（近黑绿），不用纯白。
+ *
+ * 使用约定：
+ *   1. 页面/组件样式一律 var(--shb-*) 引用，禁止硬编码色值；
+ *   2. 尺寸单位统一 rpx（750rpx = 375px 设计稿）；
+ *   3. 变量命名：--shb-<类别>-<语义>[-<层级/状态>]。
+ * ============================================================ */
+
+page {
+  /* ---- 背景层级（页面 → 卡片 → 浮层/输入 → 胶囊） ---- */
+  --shb-bg-page: #0b131b;
+  --shb-bg-card: #151d26;
+  --shb-bg-elev: #1c2530;
+  --shb-bg-chip: #18212b;
+  --shb-bg-track: #22303c;      /* 进度条底 */
+
+  /* ---- 文字层级 ---- */
+  --shb-text-primary: #ffffff;
+  --shb-text-secondary: #8a94a0;
+  --shb-text-tertiary: #7d8794;
+  --shb-text-inverse: #0c1403;  /* 主色上的深色文字 */
+
+  /* ---- 主强调：青柠绿（参考图采样） ---- */
+  --shb-color-primary: #c0e863;
+  --shb-color-primary-pressed: #a8d23f;
+  --shb-color-primary-soft: rgba(192, 232, 99, 0.14);
+
+  /* ---- 状态色 ---- */
+  --shb-color-pending: #ffb224;
+  --shb-color-pending-soft: rgba(255, 178, 36, 0.12);
+  --shb-color-danger: #ff5c6c;
+  --shb-color-danger-soft: rgba(255, 92, 108, 0.12);
+
+  /* ---- 描边 / 分隔线 ---- */
+  --shb-hairline: rgba(255, 255, 255, 0.07);
+  --shb-hairline-strong: #2a3540;
+
+  /* ---- 字号阶梯（rpx） ---- */
+  --shb-fs-xs: 20rpx;   /* 角标/元信息 */
+  --shb-fs-sm: 22rpx;   /* 辅助说明 */
+  --shb-fs-md: 24rpx;   /* 次要正文 */
+  --shb-fs-base: 28rpx; /* 正文 */
+  --shb-fs-lg: 30rpx;   /* 强调正文 */
+  --shb-fs-xl: 34rpx;   /* 卡片标题 */
+  --shb-fs-xxl: 48rpx;  /* 页面大标题 */
+
+  /* ---- 字重 ---- */
+  --shb-fw-regular: 400;
+  --shb-fw-medium: 500;
+  --shb-fw-bold: 700;
+
+  /* ---- 圆角（卡片大圆角 + 胶囊全圆） ---- */
+  --shb-radius-sm: 8rpx;
+  --shb-radius-md: 24rpx;
+  --shb-radius-lg: 32rpx;
+  --shb-radius-full: 999rpx;
+
+  /* ---- 间距阶梯 ---- */
+  --shb-space-xs: 8rpx;
+  --shb-space-sm: 16rpx;
+  --shb-space-md: 24rpx;
+  --shb-space-lg: 32rpx;
+  --shb-space-xl: 40rpx;
+
+  /* ---- 等宽数字字体（计分板） ---- */
+  --shb-font-num: "SF Mono", Menlo, Consolas, "Courier New", monospace;
+}

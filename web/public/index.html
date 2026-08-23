@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上号吧 · 网页运行时</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: radial-gradient(1200px 600px at 50% -100px, #101a24, #05090d 60%);
+  color: #dfe6ee;
+  font-family: -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 16px 48px;
+}
+
+/* ---- 顶部控制条 ---- */
+.topbar { width: 100%; max-width: 1020px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto; }
+.brand h1 { font-size: 19px; letter-spacing: 2px; color: #eef3f8; }
+.brand .tag {
+  font-size: 11px; color: #0c1403; background: #b1e92c; border-radius: 10px;
+  padding: 2px 10px; font-weight: 700; letter-spacing: 1px;
+}
+.ctrl { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.ctrl label { color: #8a94a0; }
+select, .btn {
+  background: #151d26; color: #dfe6ee; border: 1px solid #26313d; border-radius: 10px;
+  padding: 7px 12px; font-size: 13px; outline: none; cursor: pointer; font-family: inherit;
+}
+select:hover, .btn:hover { border-color: #3a4753; }
+.btn:active { transform: translateY(1px); }
+.btn--lime { background: #b1e92c; color: #0c1403; border-color: #b1e92c; font-weight: 700; }
+
+.hint { width: 100%; max-width: 1020px; margin-top: 10px; font-size: 12px; color: #566070; line-height: 1.7; }
+.hint b { color: #8a94a0; font-weight: 600; }
+
+/* ---- 手机 ---- */
+.stage { margin-top: 26px; display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+.phone {
+  width: 375px; height: 760px; background: #05090d; border-radius: 34px; padding: 10px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .55), 0 0 0 1px #1a2530;
+  flex-shrink: 0;
+}
+.phone__notch {
+  height: 26px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 22px 0 18px; color: #cfd6de; font-size: 12px; font-weight: 600;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+.phone__notch::after {
+  content: ''; width: 62px; height: 16px; border-radius: 8px; background: #0b1117;
+  border: 1px solid #1c2631;
+}
+.wx-app {
+  position: relative; width: 100%; height: calc(100% - 26px); background: #0b131b;
+  border-radius: 0 0 24px 24px; overflow: hidden; display: flex; flex-direction: column;
+}
+.wx-app--error { display: flex; align-items: center; justify-content: center; padding: 30px; color: #ff5c6c; font-size: 13px; line-height: 1.8; white-space: pre-wrap; }
+
+/* 加载中 */
+.boot-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #566070; font-size: 13px; letter-spacing: 2px; }
+
+@media (max-width: 800px) {
+  .phone { height: 82vh; min-height: 560px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <h1>上号吧</h1>
+    <span class="tag">网页运行时</span>
+  </div>
+  <div class="ctrl">
+    <label>当前玩家</label>
+    <select id="userSelect"></select>
+    <button class="btn" id="btnDual">双开第二玩家</button>
+    <button class="btn" id="btnHome">回到大厅</button>
+    <button class="btn btn--lime" id="btnReset">重置演示数据</button>
+  </div>
+</div>
+<p class="hint">
+  浏览器里运行的是<b>真实的小程序页面代码与云函数代码</b>（wx API / 微信云开发由本地模拟）。
+  数据保存在服务器内存中，点「重置演示数据」可随时还原；「双开第二玩家」可开第二个窗口模拟联机（准备 / 聊天近实时同步）。
+</p>
+
+<div class="stage">
+  <div class="phone">
+    <div class="phone__notch" id="notchClock">--:--</div>
+    <div class="wx-app" id="wxApp"><div class="boot-loading">正在加载小程序…</div></div>
+  </div>
+</div>
+
+<script>
+// 状态栏时钟
+function tickClock() {
+  var d = new Date();
+  document.getElementById('notchClock').textContent =
+    ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
+tickClock();
+setInterval(tickClock, 15000);
+
+// 玩家身份：URL ?uid= 优先，其次 localStorage
+var params = new URLSearchParams(location.search);
+var uid = params.get('uid') || localStorage.getItem('shb-uid') || 'u-kele';
+localStorage.setItem('shb-uid', uid);
+
+function reloadWithUid(u) {
+  localStorage.setItem('shb-uid', u);
+  params.set('uid', u);
+  location.search = params.toString();
+}
+
+fetch('/api/users').then(function (r) { return r.json(); }).then(function (res) {
+  var sel = document.getElementById('userSelect');
+  var users = (res.users || []).filter(function (u) { return u.openid !== 'u-kele'; });
+  users.unshift({ openid: 'u-kele', gameNickname: 'Kele' });
+  sel.innerHTML = users.map(function (u) {
+    var label = u.gameNickname || u.openid;
+    var isSelf = u.openid === uid;
+    return '<option value="' + u.openid + '"' + (isSelf ? ' selected' : '') + '>' +
+      label + (isSelf ? '（当前）' : '') + ' · ' + u.openid + '</option>';
+  }).join('');
+  window.__shbOtherUser = users.filter(function (u) { return u.openid !== uid; })[0];
+});
+
+document.getElementById('userSelect').addEventListener('change', function () {
+  reloadWithUid(this.value);
+});
+document.getElementById('btnReset').addEventListener('click', function () {
+  this.textContent = '重置中…';
+  fetch('/api/seed', { method: 'POST' }).then(function () { location.reload(); });
+});
+document.getElementById('btnDual').addEventListener('click', function () {
+  var other = window.__shbOtherUser;
+  if (!other) return;
+  var u = new URL(location.href);
+  u.searchParams.set('uid', other.openid);
+  u.searchParams.delete('route');
+  window.open(u.toString(), '_blank', 'width=420,height=860');
+});
+document.getElementById('btnHome').addEventListener('click', function () {
+  if (window.WMP && WMP.nav) { WMP.nav.reLaunch('/pages/index/index'); }
+});
+</script>
+
+<script>
+// 运行时脚本：带时间戳加载，避免开发期间浏览器缓存旧版本（async=false 保证顺序执行）
+(function () {
+  var v = Date.now();
+  var files = ['expr', 'wxml', 'wxapi', 'loader', 'core'];
+  if (new URLSearchParams(location.search).get('scenario')) files.push('testdrive');
+  files.forEach(function (name) {
+    var s = document.createElement('script');
+    s.async = false;
+    s.src = '/runtime/' + name + '.js?v=' + v;
+    document.head.appendChild(s);
+  });
+})();
+</script>
+</body>
+</html>

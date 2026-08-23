@@ -1,3 +1,6 @@
+// 云环境等占位配置集中在 config/env.js，部署时只需改那一处
+var envConfig = require('./config/env');
+
 App({
   globalData: {
     user: null
@@ -14,7 +17,7 @@ App({
     }
 
     wx.cloud.init({
-      env: '请替换为你的云环境ID',
+      env: envConfig.cloudEnv,
       traceUser: true
     });
   }

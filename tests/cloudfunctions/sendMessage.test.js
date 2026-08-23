@@ -52,4 +52,17 @@ describe('sendMessage 云函数', () => {
     await sendMessage.main({ roomId: 'r1', content: 'x'.repeat(500) });
     expect(cloud.__collection('messages')[0].content).toHaveLength(200);
   });
+
+  test('发送消息后刷新房间 lastActiveAt', async () => {
+    cloud.__setOpenid('p1');
+    seedRoom();
+    cloud.__collection('rooms')[0].lastActiveAt = 0;
+    cloud.__seed('participants', [{ _id: 'p1x', roomId: 'r1', openid: 'p1' }]);
+
+    await sendMessage.main({ roomId: 'r1', content: 'hi' });
+
+    const room = cloud.__collection('rooms')[0];
+    expect(room.lastActiveAt).toBeGreaterThan(0);
+    expect(room.lastActiveAt).toBe(room.updatedAt);
+  });
 });

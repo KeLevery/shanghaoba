@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上号吧 · 参考图还原 UI 预览（深色电竞 · 青柠绿）</title>
+<style>
+/* ============================================================
+   上号吧 · 按用户参考图还原
+   深蓝黑底 + 青柠绿主色（#B1E92C 采样自参考图）
+   胶囊筛选 chips / 封面卡片 / 底部凸起绿色＋按钮
+   ============================================================ */
+:root {
+  --bg: #0b131b;          /* 页面底（采样 #0A131A） */
+  --card: #151d26;        /* 卡片底（采样 #161E26） */
+  --elev: #1c2530;        /* 浮层/输入底 */
+  --chipbg: #18212b;      /* 未选中胶囊底 */
+  --track: #22303c;       /* 进度条底 */
+  --ink: #ffffff;
+  --ink-2: #8a94a0;
+  --ink-3: #566070;
+  --lime: #b1e92c;        /* 主色（采样） */
+  --lime-deep: #93c814;
+  --lime-soft: rgba(177, 233, 44, 0.14);
+  --amber: #ffb224;
+  --amber-soft: rgba(255, 178, 36, 0.12);
+  --red: #ff5c6c;
+  --red-soft: rgba(255, 92, 108, 0.12);
+  --hairline: rgba(255, 255, 255, 0.07);
+  --g-valorant: #ff4655;
+  --g-delta: #5b8c3e;
+  --g-cs2: #e09512;
+  --g-lol: #0a9c8b;
+  --g-naraka: #c93a3a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+body {
+  background: #05090d; color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  padding: 36px 20px 60px; display: flex; flex-wrap: wrap; gap: 26px; justify-content: center;
+}
+.num { font-family: "SF Mono", Menlo, Consolas, "Courier New", monospace; font-weight: 600; }
+h1 { width: 100%; text-align: center; font-size: 22px; letter-spacing: 6px; color: #dfe6ee; }
+.sub { width: 100%; text-align: center; color: var(--ink-3); font-size: 13px; margin: -14px 0 6px; }
+
+.phone { width: 375px; background: var(--bg); border: 1px solid #1a2530; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+.statusbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px 4px; font-size: 12px; font-weight: 600; color: #cfd6de; }
+.statusbar .capsule { width: 40px; height: 24px; border: 1px solid #2a3540; border-radius: 12px; }
+.screen { flex: 1; min-height: 700px; display: flex; flex-direction: column; }
+
+/* ---- 页眉：大标题 + 铃铛 ---- */
+.apphead { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px 0; }
+.apphead__title { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+.bell { width: 34px; height: 34px; border-radius: 17px; background: var(--card); display: flex; align-items: center; justify-content: center; position: relative; }
+.bell i { display: block; width: 12px; height: 12px; border: 2px solid #aab4c0; border-bottom: none; border-radius: 7px 7px 2px 2px; position: relative; }
+.bell i::before { content: ''; position: absolute; left: 3px; top: 10px; width: 6px; height: 2px; background: #aab4c0; border-radius: 1px; }
+.bell i::after { content: ''; position: absolute; left: 4px; top: 13px; width: 4px; height: 4px; border-radius: 50%; background: #aab4c0; }
+.bell .dot { position: absolute; top: 5px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--lime); border: 2px solid var(--card); }
+
+/* ---- 胶囊筛选 ---- */
+.chips-row { display: flex; gap: 10px; padding: 16px 18px 14px; overflow-x: auto; }
+.pill { flex-shrink: 0; height: 32px; display: flex; align-items: center; padding: 0 16px; border-radius: 16px; background: var(--chipbg); color: var(--ink-2); font-size: 13px; }
+.pill.on { background: var(--lime); color: #0c1403; font-weight: 700; }
+
+/* ---- 分区标题 ---- */
+.sec { display: flex; align-items: center; justify-content: space-between; padding: 18px 18px 12px; }
+.sec__t { display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 700; }
+.sec__t::before { content: ''; width: 4px; height: 14px; border-radius: 2px; background: var(--lime); }
+.sec__n { font-size: 11px; color: var(--ink-3); }
+
+/* ---- 房间卡 ---- */
+.rooms { display: flex; flex-direction: column; gap: 12px; padding: 0 18px; }
+.rcard { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 16px; padding: 14px; }
+.rcard__cover { width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: rgba(255,255,255,.94); }
+.rcard__main { flex: 1; min-width: 0; }
+.rcard__title { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rcard__title em { font-style: normal; font-weight: 500; color: var(--ink-2); font-size: 13px; }
+.rcard__meta { margin-top: 4px; font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.rcard__meta b { color: #d7dee6; font-weight: 600; }
+.rcard__side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.rcard__count { font-size: 17px; }
+.rcard__count small { font-size: 11px; color: var(--ink-3); font-weight: 500; }
+.join { height: 28px; display: flex; align-items: center; padding: 0 16px; border-radius: 14px; background: var(--lime); color: #0c1403; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+.join--full { background: var(--chipbg); color: var(--ink-3); }
+.tagdot { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--lime); }
+.tagdot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); }
+.tagdot--amber { color: var(--amber); }
+.tagdot--amber::before { background: var(--amber); }
+.tagdot--gray { color: var(--ink-3); }
+.tagdot--gray::before { background: var(--ink-3); }
+
+/* ---- 空态 ---- */
+.empty { margin: 24px 18px; background: var(--card); border-radius: 16px; padding: 48px 20px; text-align: center; }
+.empty__mark { width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%; background: var(--lime-soft); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--lime); font-weight: 800; }
+.empty__t { font-size: 15px; font-weight: 700; color: #d7dee6; }
+.empty__d { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+.empty .join { margin: 18px auto 0; height: 36px; padding: 0 24px; font-size: 13px; }
+
+/* ---- 底部导航（凸起＋） ---- */
+.tabbar { margin-top: auto; display: flex; align-items: flex-end; background: #0d151d; border-top: 1px solid var(--hairline); padding: 8px 0 10px; position: relative; }
+.titem { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink-3); font-size: 10px; padding-top: 8px; }
+.titem.on { color: var(--lime); font-weight: 700; }
+.titem--fab { padding-top: 0; }
+.fab { width: 56px; height: 56px; border-radius: 50%; background: var(--lime); margin-top: -30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(177, 233, 44, 0.28); }
+.fab i, .fab i::before { position: absolute; background: #0c1403; border-radius: 2px; }
+.fab i { width: 22px; height: 4px; }
+.fab i::before { content: ''; left: 9px; top: 0; width: 4px; height: 22px; }
+.ticon { width: 24px; height: 24px; position: relative; }
+.ticon--home::before { content: ''; position: absolute; inset: 3px 3px 8px; border: 2px solid currentColor; border-radius: 4px; }
+.ticon--home::after { content: ''; position: absolute; left: 8px; top: 0; width: 12px; height: 9px; border: 2px solid currentColor; border-bottom: none; border-radius: 4px 4px 0 0; }
+.ticon--chat { position: absolute; }
+.ticon--chat::before { content: ''; position: absolute; inset: 2px 2px 8px; border: 2px solid currentColor; border-radius: 6px; }
+.ticon--chat::after { content: ''; position: absolute; left: 5px; bottom: 1px; width: 8px; height: 8px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg) skewX(8deg); }
+.ticon--user::before { content: ''; position: absolute; left: 7px; top: 1px; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.ticon--user::after { content: ''; position: absolute; left: 3px; top: 12px; width: 16px; height: 8px; border-radius: 8px 8px 2px 2px; background: currentColor; }
+
+/* ---- 发起上号 ---- */
+.pagehead { padding: 10px 18px 2px; font-size: 22px; font-weight: 800; }
+.formcard { margin: 14px 18px 0; background: var(--card); border-radius: 16px; padding: 16px; }
+.formcard__t { font-size: 13px; font-weight: 700; color: #d7dee6; margin-bottom: 12px; display: flex; justify-content: space-between; }
+.formcard__t small { font-weight: 400; color: var(--ink-3); font-size: 11px; }
+.ggrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gitem { border-radius: 14px; overflow: hidden; background: var(--elev); position: relative; border: 2px solid transparent; }
+.gitem.on { border-color: var(--lime); }
+.gitem__cover { height: 92px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; color: rgba(255,255,255,.94); }
+.gitem__row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 10px; }
+.gitem__name { font-size: 13px; font-weight: 700; }
+.gitem__def { font-size: 10px; color: var(--ink-3); }
+.gitem__check { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; background: var(--lime); color: #0c1403; font-size: 12px; font-weight: 800; display: none; align-items: center; justify-content: center; }
+.gitem.on .gitem__check { display: flex; }
+.stepper { display: flex; align-items: center; }
+.stepper__btn { width: 44px; height: 44px; border-radius: 12px; background: var(--elev); color: #d7dee6; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+.stepper__val { flex: 1; text-align: center; font-size: 22px; }
+.stepper__val span { font-size: 12px; color: var(--ink-3); margin-left: 4px; }
+.qnums { display: flex; gap: 8px; margin-top: 12px; }
+.qnum { width: 38px; height: 30px; border-radius: 15px; background: var(--elev); color: var(--ink-2); font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.qnum.on { background: var(--lime); color: #0c1403; font-weight: 700; }
+.fchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fchip { min-width: 60px; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--elev); color: var(--ink-2); font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.fchip.on { background: var(--lime); color: #0c1403; font-weight: 700; }
+.finput { width: 100%; height: 42px; border-radius: 12px; background: var(--elev); border: none; outline: none; padding: 0 14px; color: var(--ink); font-size: 14px; margin-top: 12px; }
+.ftextarea { width: 100%; min-height: 84px; border-radius: 12px; background: var(--elev); border: none; outline: none; padding: 10px 14px; color: var(--ink); font-size: 14px; resize: none; }
+.fcount { text-align: right; font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+.submitbar { margin-top: 18px; padding: 0 18px 18px; }
+.submit { width: 100%; height: 50px; border-radius: 16px; background: var(--lime); color: #0c1403; font-size: 16px; font-weight: 800; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; }
+.submit small { display: block; text-align: center; margin-top: 8px; color: var(--ink-3); font-size: 11px; font-weight: 400; letter-spacing: 0; }
+
+/* ---- 房间详情 ---- */
+.dossier { margin: 14px 18px 0; background: var(--card); border-radius: 16px; padding: 16px; display: flex; gap: 14px; }
+.dossier__cover { width: 84px; height: 84px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: rgba(255,255,255,.94); }
+.dossier__main { flex: 1; min-width: 0; }
+.dossier__title { font-size: 17px; font-weight: 800; }
+.dossier__title em { font-style: normal; font-weight: 500; font-size: 14px; color: var(--ink-2); }
+.dossier__meta { margin-top: 5px; font-size: 12px; color: var(--ink-2); }
+.dossier__meta b { color: #d7dee6; }
+.dossier__progress { margin-top: 12px; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+.dossier__fill { height: 100%; border-radius: 3px; background: var(--lime); }
+.dossier__prow { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--ink-2); }
+.dossier__prow b { color: var(--lime); }
+.noticebar { margin: 12px 18px 0; background: var(--amber-soft); border: 1px solid rgba(255,178,36,.4); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: var(--amber); font-weight: 600; }
+.board { margin: 12px 18px 0; background: var(--card); border-radius: 16px; padding: 4px 16px; }
+.board__head { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 8px; font-size: 13px; font-weight: 700; }
+.board__head span { font-size: 11px; color: var(--ink-2); font-weight: 400; }
+.board__head span b { color: var(--lime); }
+.mem { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--hairline); }
+.mem__ava { width: 40px; height: 40px; border-radius: 50%; background: var(--elev); color: #cfd6de; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.mem__ava--on { background: var(--lime); color: #0c1403; }
+.mem__name { flex: 1; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mem__role { font-size: 10px; color: var(--amber); border: 1px solid rgba(255,178,36,.5); padding: 1px 6px; border-radius: 8px; }
+.mem__state { font-size: 12px; color: var(--ink-3); }
+.mem__state--on { color: var(--lime); font-weight: 700; }
+.mem__kick { color: var(--red); font-size: 14px; padding: 2px 6px; }
+.mem--empty { color: var(--ink-3); font-size: 12px; }
+.mem--empty .mem__ava { background: transparent; border: 1px dashed #33414e; color: var(--ink-3); font-size: 14px; }
+.chat { margin: 12px 18px 0; background: var(--card); border-radius: 16px; overflow: hidden; }
+.chat__list { height: 240px; overflow-y: auto; padding: 14px; }
+.msg { display: flex; flex-direction: column; margin-bottom: 14px; }
+.msg--self { align-items: flex-end; }
+.msg__meta { font-size: 10px; color: var(--ink-3); margin-bottom: 4px; padding: 0 4px; }
+.msg__meta b { color: var(--ink-2); }
+.msg__bub { max-width: 76%; padding: 9px 13px; border-radius: 14px; background: var(--elev); font-size: 14px; line-height: 1.5; }
+.msg--self .msg__bub { background: var(--lime); color: #0c1403; font-weight: 500; border-bottom-right-radius: 4px; }
+.msg__bub { border-bottom-left-radius: 4px; }
+.chat__bar { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: 1px solid var(--hairline); }
+.chat__in { flex: 1; height: 38px; border-radius: 19px; background: var(--elev); border: none; outline: none; padding: 0 14px; color: var(--ink); font-size: 14px; }
+.chat__send { width: 68px; height: 38px; border-radius: 19px; background: var(--lime); color: #0c1403; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.chat__send.off { background: var(--elev); color: var(--ink-3); }
+.danger { text-align: center; padding: 18px 0 4px; font-size: 12px; color: var(--red); }
+.actionbar { margin: 12px 18px 18px; display: flex; gap: 10px; }
+.abtn { flex: 1; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+.abtn--ghost { background: var(--card); color: #d7dee6; border: 1px solid #2a3540; flex: 0 0 76px; }
+.abtn--lime { background: var(--lime); color: #0c1403; letter-spacing: 1px; }
+.abtn--outline { background: transparent; border: 1.5px solid var(--lime); color: var(--lime); }
+
+/* ---- 我的 ---- */
+.ucard { margin: 14px 18px 0; background: var(--card); border-radius: 16px; padding: 20px 16px; display: flex; align-items: center; gap: 14px; }
+.ucard__ava { width: 60px; height: 60px; border-radius: 50%; background: var(--lime); color: #0c1403; font-size: 26px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.ucard__main { flex: 1; min-width: 0; }
+.ucard__name { font-size: 18px; font-weight: 800; }
+.ucard__sub { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+.ucard__edit { font-size: 12px; color: var(--lime); border: 1px solid var(--lime); border-radius: 14px; padding: 6px 14px; font-weight: 600; }
+.editpanel { margin: 12px 18px 0; background: var(--card); border-radius: 16px; padding: 16px; }
+.editpanel .finput { margin-top: 0; }
+.editrow { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.editrow .fcount { margin-top: 0; }
+.savebtn { width: 96px; height: 40px; border-radius: 13px; background: var(--lime); color: #0c1403; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.setgroup { margin: 12px 18px 0; background: var(--card); border-radius: 16px; padding: 4px 16px; }
+.setrow { display: flex; align-items: center; padding: 15px 0; border-top: 1px solid var(--hairline); font-size: 14px; }
+.setrow:first-child { border-top: none; }
+.setrow__label { flex: 1; }
+.setrow__val { font-size: 12px; color: var(--ink-3); }
+.setrow__arrow { color: #3a4652; margin-left: 8px; }
+
+/* ---- 消息页 ---- */
+.mrow { margin: 0 18px 10px; background: var(--card); border-radius: 16px; padding: 14px; display: flex; gap: 12px; }
+.mrow__cover { width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: rgba(255,255,255,.94); }
+.mrow__main { flex: 1; min-width: 0; }
+.mrow__top { display: flex; justify-content: space-between; gap: 8px; }
+.mrow__title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mrow__title em { font-style: normal; font-weight: 500; color: var(--ink-2); font-size: 12px; }
+.mrow__time { font-size: 10px; color: var(--ink-3); flex-shrink: 0; }
+.mrow__preview { margin-top: 5px; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mrow__side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<h1>上号吧 · 参考图还原</h1>
+<p class="sub">深蓝黑底 + 青柠绿 #B1E92C · 胶囊筛选 · 封面卡片 · 凸起＋按钮</p>
+
+<!-- ============ ① 招募大厅 ============ -->
+<div class="phone">
+  <div class="statusbar"><span class="num">21:47</span><span class="capsule"></span></div>
+  <div class="screen">
+    <div class="apphead">
+      <div class="apphead__title">招募大厅</div>
+      <div class="bell"><i></i><span class="dot"></span></div>
+    </div>
+
+    <div class="chips-row">
+      <div class="pill on">全部</div>
+      <div class="pill">无畏契约</div>
+      <div class="pill">三角洲行动</div>
+      <div class="pill">CS2</div>
+      <div class="pill">英雄联盟</div>
+      <div class="pill">永劫无间</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec__t">我的房间</div>
+      <div class="sec__n num">2 个</div>
+    </div>
+    <div class="rooms">
+      <div class="rcard">
+        <div class="rcard__cover" style="background:var(--g-valorant)">无</div>
+        <div class="rcard__main">
+          <div class="rcard__title">无畏契约 <em>· 亚海悬城 5v5</em></div>
+          <div class="rcard__meta"><b>今晚</b> · 3/5 已准备 · 房主 Kele</div>
+        </div>
+        <div class="rcard__side">
+          <div class="rcard__count num">3<small>/5</small></div>
+          <span class="tagdot tagdot--amber">等待开始</span>
+        </div>
+      </div>
+      <div class="rcard">
+        <div class="rcard__cover" style="background:var(--g-lol)">英</div>
+        <div class="rcard__main">
+          <div class="rcard__title">英雄联盟 <em>· 灵活组排</em></div>
+          <div class="rcard__meta"><b>现在开打</b> · 还差 2 人</div>
+        </div>
+        <div class="rcard__side">
+          <div class="rcard__count num">3<small>/5</small></div>
+          <span class="tagdot">招募中</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec__t">正在召集</div>
+      <div class="sec__n num">3 个房间</div>
+    </div>
+    <div class="rooms">
+      <div class="rcard">
+        <div class="rcard__cover" style="background:var(--g-cs2)">C</div>
+        <div class="rcard__main">
+          <div class="rcard__title">CS2 <em>· 官匹竞技</em></div>
+          <div class="rcard__meta"><b>现在开打</b> · 速来，就差一个</div>
+        </div>
+        <div class="rcard__side">
+          <div class="rcard__count num">4<small>/5</small></div>
+          <div class="join">加入</div>
+        </div>
+      </div>
+      <div class="rcard">
+        <div class="rcard__cover" style="background:var(--g-delta)">三</div>
+        <div class="rcard__main">
+          <div class="rcard__title">三角洲行动 <em>· 烬区行动</em></div>
+          <div class="rcard__meta"><b>今晚</b> · 来听指挥的</div>
+        </div>
+        <div class="rcard__side">
+          <div class="rcard__count num">2<small>/4</small></div>
+          <div class="join">加入</div>
+        </div>
+      </div>
+      <div class="rcard">
+        <div class="rcard__cover" style="background:var(--g-naraka)">永</div>
+        <div class="rcard__main">
+          <div class="rcard__title">永劫无间 <em>· 三排排位</em></div>
+          <div class="rcard__meta"><b>明天</b> · 段位不限</div>
+        </div>
+        <div class="rcard__side">
+          <div class="rcard__count num">3<small>/3</small></div>
+          <div class="join join--full">已满员</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+
+    <div class="tabbar">
+      <div class="titem on"><span class="ticon ticon--home"></span>大厅</div>
+      <div class="titem titem--fab"><div class="fab"><i></i></div>发起上号</div>
+      <div class="titem"><span class="ticon ticon--chat"></span>消息</div>
+      <div class="titem"><span class="ticon ticon--user"></span>我的</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ② 发起上号 ============ -->
+<div class="phone">
+  <div class="statusbar"><span class="num">21:47</span><span class="capsule"></span></div>
+  <div class="screen">
+    <div class="pagehead">发起上号</div>
+
+    <div class="formcard">
+      <div class="formcard__t">选择游戏<small>切换时带入默认人数</small></div>
+      <div class="ggrid">
+        <div class="gitem on">
+          <div class="gitem__cover" style="background:var(--g-valorant)">无</div>
+          <div class="gitem__row"><span class="gitem__name">无畏契约</span><span class="gitem__def num">5人</span></div>
+          <div class="gitem__check">✓</div>
+        </div>
+        <div class="gitem">
+          <div class="gitem__cover" style="background:var(--g-delta)">三</div>
+          <div class="gitem__row"><span class="gitem__name">三角洲行动</span><span class="gitem__def num">4人</span></div>
+          <div class="gitem__check">✓</div>
+        </div>
+        <div class="gitem">
+          <div class="gitem__cover" style="background:var(--g-cs2)">C</div>
+          <div class="gitem__row"><span class="gitem__name">CS2</span><span class="gitem__def num">5人</span></div>
+          <div class="gitem__check">✓</div>
+        </div>
+        <div class="gitem">
+          <div class="gitem__cover" style="background:var(--g-lol)">英</div>
+          <div class="gitem__row"><span class="gitem__name">英雄联盟</span><span class="gitem__def num">5人</span></div>
+          <div class="gitem__check">✓</div>
+        </div>
+        <div class="gitem">
+          <div class="gitem__cover" style="background:var(--g-naraka)">永</div>
+          <div class="gitem__row"><span class="gitem__name">永劫无间</span><span class="gitem__def num">3人</span></div>
+          <div class="gitem__check">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formcard">
+      <div class="formcard__t">队伍人数<small>2 – 20 人</small></div>
+      <div class="stepper">
+        <div class="stepper__btn">−</div>
+        <div class="stepper__val num">5<span>人</span></div>
+        <div class="stepper__btn">＋</div>
+      </div>
+      <div class="qnums">
+        <span class="qnum num">2</span><span class="qnum num">3</span><span class="qnum num">4</span>
+        <span class="qnum on num">5</span><span class="qnum num">6</span><span class="qnum num">10</span>
+      </div>
+    </div>
+
+    <div class="formcard">
+      <div class="formcard__t">模式 / 地图<small>30 字以内</small></div>
+      <div class="fchips">
+        <span class="fchip on">排位</span><span class="fchip">匹配</span><span class="fchip">娱乐</span><span class="fchip">自定义…</span>
+      </div>
+      <input class="finput" placeholder="如：亚海悬城 5v5" />
+    </div>
+
+    <div class="formcard">
+      <div class="formcard__t">开打时间</div>
+      <div class="fchips">
+        <span class="fchip on">现在开打</span><span class="fchip">今晚</span><span class="fchip">明天</span><span class="fchip">自定义</span>
+      </div>
+    </div>
+
+    <div class="formcard">
+      <div class="formcard__t">备注<small>选填</small></div>
+      <textarea class="ftextarea" placeholder="补充说明，如：来听指挥的、段位不限"></textarea>
+      <div class="fcount num">0 / 100</div>
+    </div>
+
+    <div class="submitbar">
+      <div class="submit">发起上号</div>
+    </div>
+
+    <div class="tabbar">
+      <div class="titem"><span class="ticon ticon--home"></span>大厅</div>
+      <div class="titem titem--fab on"><div class="fab"><i></i></div>发起上号</div>
+      <div class="titem"><span class="ticon ticon--chat"></span>消息</div>
+      <div class="titem"><span class="ticon ticon--user"></span>我的</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ③ 房间详情（房主 · pending） ============ -->
+<div class="phone">
+  <div class="statusbar"><span class="num">21:47</span><span class="capsule"></span></div>
+  <div class="screen">
+    <div class="pagehead">房间详情</div>
+
+    <div class="dossier">
+      <div class="dossier__cover" style="background:var(--g-cs2)">C</div>
+      <div class="dossier__main">
+        <div class="dossier__title">CS2 <em>· 官匹竞技</em></div>
+        <div class="dossier__meta"><b>现在开打</b> · 房主 <b>Kele</b></div>
+        <div class="dossier__progress"><div class="dossier__fill" style="width:100%"></div></div>
+        <div class="dossier__prow"><span>5 / 5 人</span><b>全员已准备</b></div>
+      </div>
+    </div>
+
+    <div class="noticebar">⚡ 全员已准备，随时可以开打</div>
+
+    <div class="board">
+      <div class="board__head">准备板 <span><b class="num">5</b> / <span class="num">5</span> 人已准备</span></div>
+      <div class="mem">
+        <div class="mem__ava mem__ava--on">K</div>
+        <div class="mem__name">Kele<span class="mem__role">房主</span></div>
+        <div class="mem__state mem__state--on">已准备</div>
+      </div>
+      <div class="mem">
+        <div class="mem__ava mem__ava--on">阿</div>
+        <div class="mem__name">阿伟</div>
+        <div class="mem__state mem__state--on">已准备</div>
+        <span class="mem__kick">×</span>
+      </div>
+      <div class="mem">
+        <div class="mem__ava mem__ava--on">小</div>
+        <div class="mem__name">小美</div>
+        <div class="mem__state mem__state--on">已准备</div>
+        <span class="mem__kick">×</span>
+      </div>
+    </div>
+
+    <div class="chat">
+      <div class="chat__list">
+        <div class="msg">
+          <div class="msg__meta"><b>Kele</b> · 21:31</div>
+          <div class="msg__bub">人齐了都准备一下，开一把就走</div>
+        </div>
+        <div class="msg">
+          <div class="msg__meta"><b>阿伟</b> · 21:32</div>
+          <div class="msg__bub">等我上个厕所</div>
+        </div>
+        <div class="msg msg--self">
+          <div class="msg__meta">21:33</div>
+          <div class="msg__bub">我先准备了，你们快点</div>
+        </div>
+      </div>
+      <div class="chat__bar">
+        <input class="chat__in" placeholder="说点什么…" />
+        <div class="chat__send">发送</div>
+      </div>
+    </div>
+
+    <div class="danger">解散房间</div>
+
+    <div class="actionbar">
+      <div class="abtn abtn--ghost">邀请</div>
+      <div class="abtn abtn--outline">取消准备</div>
+      <div class="abtn abtn--lime">开始游戏</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ④ 消息 ============ -->
+<div class="phone">
+  <div class="statusbar"><span class="num">21:47</span><span class="capsule"></span></div>
+  <div class="screen">
+    <div class="pagehead">消息</div>
+
+    <div style="height:12px"></div>
+    <div class="mrow">
+      <div class="mrow__cover" style="background:var(--g-valorant)">无</div>
+      <div class="mrow__main">
+        <div class="mrow__top">
+          <span class="mrow__title">无畏契约 <em>· 亚海悬城</em></span>
+          <span class="mrow__time num">21:33</span>
+        </div>
+        <div class="mrow__preview">阿伟：等我上个厕所</div>
+      </div>
+      <div class="mrow__side">
+        <div class="rcard__count num">3<small>/5</small></div>
+        <span class="tagdot tagdot--amber">等待开始</span>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mrow__cover" style="background:var(--g-lol)">英</div>
+      <div class="mrow__main">
+        <div class="mrow__top">
+          <span class="mrow__title">英雄联盟 <em>· 灵活组排</em></span>
+          <span class="mrow__time num">20:02</span>
+        </div>
+        <div class="mrow__preview">小美：我先下了，明天再玩</div>
+      </div>
+      <div class="mrow__side">
+        <div class="rcard__count num">3<small>/5</small></div>
+        <span class="tagdot tagdot--gray">进行中</span>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mrow__cover" style="background:var(--g-delta)">三</div>
+      <div class="mrow__main">
+        <div class="mrow__top">
+          <span class="mrow__title">三角洲行动 <em>· 烬区行动</em></span>
+          <span class="mrow__time num">昨天</span>
+        </div>
+        <div class="mrow__preview">还没有消息，去喊一嗓子</div>
+      </div>
+      <div class="mrow__side">
+        <div class="rcard__count num">2<small>/4</small></div>
+        <span class="tagdot">招募中</span>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="titem"><span class="ticon ticon--home"></span>大厅</div>
+      <div class="titem titem--fab"><div class="fab"><i></i></div>发起上号</div>
+      <div class="titem on"><span class="ticon ticon--chat"></span>消息</div>
+      <div class="titem"><span class="ticon ticon--user"></span>我的</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ⑤ 我的 ============ -->
+<div class="phone">
+  <div class="statusbar"><span class="num">21:47</span><span class="capsule"></span></div>
+  <div class="screen">
+    <div class="pagehead">我的</div>
+
+    <div class="ucard">
+      <div class="ucard__ava">K</div>
+      <div class="ucard__main">
+        <div class="ucard__name">Kele</div>
+        <div class="ucard__sub">游戏昵称 · 房间内向队友展示</div>
+      </div>
+      <span class="ucard__edit">修改</span>
+    </div>
+
+    <div class="editpanel">
+      <input class="finput" value="Kele" />
+      <div class="editrow">
+        <div class="fcount num">4 / 20</div>
+        <div class="savebtn">保存</div>
+      </div>
+    </div>
+
+    <div class="setgroup">
+      <div class="setrow"><span class="setrow__label">关于上号吧</span><span class="setrow__arrow">›</span></div>
+      <div class="setrow"><span class="setrow__label">隐私政策</span><span class="setrow__arrow">›</span></div>
+      <div class="setrow"><span class="setrow__label">使用条款</span><span class="setrow__arrow">›</span></div>
+      <div class="setrow"><span class="setrow__label">意见反馈</span><span class="setrow__arrow">›</span></div>
+      <div class="setrow"><span class="setrow__label">清除缓存</span><span class="setrow__val num">1.2MB</span></div>
+      <div class="setrow"><span class="setrow__label">版本</span><span class="setrow__val num">1.0.0</span></div>
+    </div>
+    <div style="height:20px"></div>
+
+    <div class="tabbar">
+      <div class="titem"><span class="ticon ticon--home"></span>大厅</div>
+      <div class="titem titem--fab"><div class="fab"><i></i></div>发起上号</div>
+      <div class="titem"><span class="ticon ticon--chat"></span>消息</div>
+      <div class="titem on"><span class="ticon ticon--user"></span>我的</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

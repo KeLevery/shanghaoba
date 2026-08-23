@@ -1,38 +1,142 @@
-<view class="container" wx:if="{{room}}">
-  <view class="card room-hero">
-    <view class="room-top"><text class="game-name">{{room.game}}</text><text class="badge {{room.isReadyState ? 'ready-badge' : ''}} {{room.isPendingState ? 'pending-badge' : ''}}">{{room.statusText}}</text></view>
-    <view class="mode">{{room.mode || '一起开黑'}}</view>
-    <view class="meta"><text>{{room.startTimeLabel}}</text><text>{{participants.length}} / {{room.maxPlayers}} 人</text></view>
-    <view wx:if="{{room.remark}}" class="remark">{{room.remark}}</view>
-  </view>
+<!-- ============================================================
+  room-detail 房间详情（参考图样式 · 单屏作战室）
+  房间档案卡（封面+进度条）→ pending 提示条 → 准备板 → 聊天
+  → 危险操作 → 底部固定操作栏（邀请 / 准备 / 开始）
+============================================================ -->
+<view class="page" wx:if="{{room}}">
 
-  <view class="section-title"><view>队友 <text class="muted">{{participants.length}} 人</text></view><text wx:if="{{room.isReadyState || room.isPendingState}}" class="ready-hint">全员已准备</text></view>
-  <view class="card members">
-    <view class="member" wx:for="{{participants}}" wx:key="openid">
-      <view class="avatar">{{item.displayNameInitial}}</view>
-      <view class="member-info"><text>{{item.displayName}}</text><text class="member-role">{{item.isHost ? '房主' : '队员'}}</text></view>
-      <text class="ready {{item.ready ? 'is-ready' : ''}}">{{item.ready ? '准备好了' : '未准备'}}</text>
-      <text wx:if="{{isHost && !item.isHost}}" class="kick" bindtap="kickMember" data-openid="{{item.openid}}">移除</text>
+  <view class="pagehead">房间详情</view>
+
+  <!-- 房间档案卡：封面 + 标题/meta + 满员进度条 -->
+  <view class="dossier">
+    <view class="dossier__cover">
+      <game-cover game="{{room.game}}" />
+    </view>
+    <view class="dossier__main">
+      <view class="dossier__title-row">
+        <text class="dossier__title">{{room.game}}</text>
+        <text wx:if="{{room.mode}}" class="dossier__mode">· {{room.mode}}</text>
+        <status-tag class="dossier__tag" status="{{room.status}}" />
+      </view>
+      <view class="dossier__meta">
+        <text class="dossier__meta-strong">{{room.startTimeLabel}}</text>
+        <text> · 房主 </text>
+        <text class="dossier__meta-strong">{{hostName || '神秘玩家'}}</text>
+      </view>
+      <view wx:if="{{room.remark}}" class="dossier__remark">{{room.remark}}</view>
+      <view class="dossier__progress">
+        <view class="dossier__fill" style="width: {{fillPct}}%;"></view>
+      </view>
+      <view class="dossier__prow">
+        <text class="num">{{participants.length}} / {{room.maxPlayers}} 人</text>
+        <text class="dossier__pready"><text class="num">{{readyCount}}</text> 人已准备</text>
+      </view>
     </view>
   </view>
 
-  <view class="section-title">简单聊天</view>
-  <view class="card chat-card">
-    <scroll-view scroll-y class="messages" scroll-into-view="{{lastMessageId}}">
-      <view wx:if="{{!messages.length}}" class="empty-chat">说点什么，喊大家准备上号吧</view>
-      <view wx:for="{{messages}}" wx:key="_id" id="msg-{{item._id}}" class="message">
-        <text class="message-name">{{item.displayName}}</text><text>{{item.content}}</text>
-      </view>
-    </scroll-view>
-    <view class="chat-input"><input placeholder="输入消息" maxlength="200" value="{{messageContent}}" bindinput="onMessageInput" bindconfirm="sendMessage"/><button bindtap="sendMessage" disabled="{{!messageContent}}">发送</button></view>
+  <!-- 全员已准备提示条（仅 pending 态） -->
+  <view wx:if="{{room.isPendingState}}" class="notice">
+    <text>⚡ 全员已准备，{{isHost ? '随时可以开打' : '等待房主开始'}}</text>
   </view>
 
-  <view class="actions">
-    <button wx:if="{{!isHost}}" class="primary-button" bindtap="toggleReady">{{myReady ? '取消准备' : '我准备好了'}}</button>
-    <button wx:if="{{isHost}}" class="primary-button" bindtap="toggleReady">{{myReady ? '取消准备' : '房主已准备'}}</button>
-    <button wx:if="{{isHost && room.isPendingState}}" class="start-button" bindtap="startRoom">开始游戏</button>
-    <button wx:if="{{!isHost}}" class="secondary-button" bindtap="leaveRoom">退出房间</button>
-    <button wx:if="{{isHost}}" class="danger-button" bindtap="dissolveRoom">解散房间</button>
+  <!-- 准备板 -->
+  <view class="board">
+    <view class="board__head">
+      <view class="sec-title">准备板</view>
+      <view class="board__count"><text class="num board__ready">{{readyCount}}</text><text class="num"> / {{participants.length}}</text><text> 人已准备</text></view>
+    </view>
+    <member-item
+      wx:for="{{participants}}"
+      wx:key="openid"
+      openid="{{item.openid}}"
+      displayName="{{item.displayName}}"
+      isHost="{{item.isHost}}"
+      ready="{{item.ready}}"
+      canRemove="{{isHost}}"
+      bind:remove="onRemoveMember"
+    />
+    <!-- 空位占位行 -->
+    <member-item
+      wx:for="{{emptySlots}}"
+      wx:key="*this"
+      isEmpty="{{true}}"
+      slotIndex="{{item}}"
+    />
+  </view>
+
+  <!-- 聊天（常驻） -->
+  <view class="chat">
+    <scroll-view scroll-y class="chat__list" scroll-into-view="{{lastMessageId}}" scroll-with-animation>
+      <view wx:if="{{!messages.length}}" class="chat__empty">还没有消息，喊一嗓子让大家准备</view>
+      <view wx:for="{{messages}}" wx:key="_id" id="msg-{{item._id}}" class="chat__item">
+        <chat-bubble
+          content="{{item.content}}"
+          displayName="{{item.displayName}}"
+          createdAt="{{item.createdAt}}"
+          isSelf="{{item.isSelf}}"
+        />
+      </view>
+    </scroll-view>
+    <view class="chat__bar">
+      <input
+        class="chat__input"
+        placeholder="说点什么…"
+        placeholder-class="sunk-placeholder"
+        maxlength="200"
+        confirm-type="send"
+        adjust-position="{{true}}"
+        value="{{messageContent}}"
+        bindinput="onMessageInput"
+        bindconfirm="sendMessage"
+      />
+      <view
+        class="chat__send num {{messageContent ? '' : 'chat__send--disabled'}}"
+        hover-class="chat__send--hover"
+        bindtap="sendMessage"
+      >发送</view>
+    </view>
+  </view>
+
+  <!-- 危险操作（弱化文字链接） -->
+  <view class="danger-zone">
+    <view wx:if="{{isHost}}" class="btn--danger-link" hover-class="danger-link--hover" bindtap="dissolveRoom">解散房间</view>
+    <view wx:else class="btn--danger-link" hover-class="danger-link--hover" bindtap="leaveRoom">退出房间</view>
+  </view>
+
+  <!-- 底部占位，避免内容被操作栏遮挡 -->
+  <view class="page-tail"></view>
+
+  <!-- 底部固定操作栏：邀请（分享） / 准备 / 开始（房主且 pending） -->
+  <view class="action-bar safe-area-bottom">
+    <button class="btn btn--ghost action-bar__btn action-bar__btn--invite" hover-class="btn--ghost-hover" open-type="share">邀请</button>
+
+    <!-- 准备 / 取消准备（房主与队员均可；开打后锁定，不再显示） -->
+    <block wx:if="{{!room.isReadyState}}">
+      <view
+        wx:if="{{!myReady}}"
+        class="btn btn--primary action-bar__btn"
+        hover-class="btn--primary-hover"
+        bindtap="toggleReady"
+      >我准备好了</view>
+      <view
+        wx:else
+        class="btn btn--outline-primary action-bar__btn"
+        hover-class="btn--ghost-hover"
+        bindtap="toggleReady"
+      >取消准备</view>
+    </block>
+
+    <!-- 开始游戏：仅房主且 pending 态显示 -->
+    <view
+      wx:if="{{isHost && room.isPendingState}}"
+      class="btn btn--primary action-bar__btn"
+      hover-class="btn--primary-hover"
+      bindtap="startRoom"
+    >开始游戏</view>
   </view>
 </view>
-<view wx:else class="container"><view class="empty">房间加载中…</view></view>
+
+<!-- 加载/异常占位 -->
+<view wx:else class="page page--loading">
+  <empty-state title="房间加载中…" />
+</view>

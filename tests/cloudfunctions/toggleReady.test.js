@@ -71,7 +71,7 @@ describe('toggleReady 云函数', () => {
     expect(cloud.__collection('rooms')[0].status).toBe('recruiting');
   });
 
-  test('ready 房间中取消准备后回退为 recruiting（与锁定只由开始触发的语义一致）', async () => {
+  test('ready（已开打）房间锁定准备状态：取消准备被拒绝且状态不变', async () => {
     cloud.__setOpenid('p1');
     seedRoom('ready', 3);
     cloud.__seed('participants', [
@@ -79,9 +79,22 @@ describe('toggleReady 云函数', () => {
       { _id: 'p1', roomId: 'r1', openid: 'p1', ready: true }
     ]);
 
-    const result = await toggleReady.main({ roomId: 'r1' });
+    await expect(toggleReady.main({ roomId: 'r1' })).rejects.toThrow('已开打，不能再修改准备状态');
+    // 房间保持已开打，成员准备状态不被改动
+    expect(cloud.__collection('rooms')[0].status).toBe('ready');
+    expect(cloud.__collection('participants').every(p => p.ready)).toBe(true);
+  });
 
-    expect(result.ready).toBe(false);
-    expect(cloud.__collection('rooms')[0].status).toBe('recruiting');
+  test('切换准备状态后刷新房间 lastActiveAt', async () => {
+    cloud.__setOpenid('p1');
+    seedRoom('recruiting', 3);
+    cloud.__collection('rooms')[0].lastActiveAt = 0;
+    cloud.__seed('participants', [{ _id: 'p1x', roomId: 'r1', openid: 'p1', ready: false }]);
+
+    await toggleReady.main({ roomId: 'r1' });
+
+    const room = cloud.__collection('rooms')[0];
+    expect(room.lastActiveAt).toBeGreaterThan(0);
+    expect(room.lastActiveAt).toBe(room.updatedAt);
   });
 });

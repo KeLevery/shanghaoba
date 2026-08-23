@@ -2,15 +2,29 @@
   "pages": [
     "pages/index/index",
     "pages/create-room/index",
+    "pages/messages/index",
+    "pages/profile/index",
     "pages/room-detail/index",
-    "pages/profile/index"
+    "pages/about/index"
   ],
   "window": {
     "navigationBarTitleText": "上号吧",
-    "navigationBarBackgroundColor": "#f7f8fa",
-    "navigationBarTextStyle": "black",
-    "backgroundColor": "#f7f8fa",
+    "navigationBarBackgroundColor": "#0b131b",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0b131b",
     "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#566070",
+    "selectedColor": "#c0e863",
+    "backgroundColor": "#0d151d",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "招募大厅" },
+      { "pagePath": "pages/create-room/index", "text": "发起上号" },
+      { "pagePath": "pages/messages/index", "text": "消息" },
+      { "pagePath": "pages/profile/index", "text": "我的" }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

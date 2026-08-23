@@ -4,7 +4,7 @@ const notificationConfig = require('./notificationConfig');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
+const { STATUS } = require('./_shared/constants');
 
 function notificationResult(status, attempted, sent, failed, unsubscribed) {
   return { status, attempted, sent, failed, unsubscribed: unsubscribed || 0 };
@@ -84,7 +84,7 @@ exports.main = async (event) => {
   const participants = (await db.collection('participants').where({ roomId }).get()).data;
   const now = Date.now();
   await db.collection('rooms').doc(roomId).update({
-    data: { status: STATUS.READY, updatedAt: now, allReadyAt: now, readyNotificationStatus: 'pending' }
+    data: { status: STATUS.READY, updatedAt: now, lastActiveAt: now, allReadyAt: now, readyNotificationStatus: 'pending' }
   });
 
   const notification = await sendReadyNotifications({ ...room, _id: roomId }, participants);

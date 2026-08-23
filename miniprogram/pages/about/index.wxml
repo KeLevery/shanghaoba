@@ -1,0 +1,63 @@
+<!-- ============================================================
+  关于 / 隐私政策 / 使用条款（V2 纸面文章排版）
+============================================================ -->
+<view class="page">
+
+  <!-- 切换（下划线文字 tabs） -->
+  <view class="switcher">
+    <view
+      class="switcher__item {{tab === 'about' ? 'switcher__item--active' : ''}}"
+      data-tab="about"
+      hover-class="switcher__item--hover"
+      bindtap="onTabTap"
+    >关于</view>
+    <view
+      class="switcher__item {{tab === 'privacy' ? 'switcher__item--active' : ''}}"
+      data-tab="privacy"
+      hover-class="switcher__item--hover"
+      bindtap="onTabTap"
+    >隐私政策</view>
+    <view
+      class="switcher__item {{tab === 'terms' ? 'switcher__item--active' : ''}}"
+      data-tab="terms"
+      hover-class="switcher__item--hover"
+      bindtap="onTabTap"
+    >使用条款</view>
+  </view>
+
+  <!-- 关于上号吧 -->
+  <view wx:if="{{tab === 'about'}}" class="article">
+    <view class="article__brand">
+      <view class="article__brand-mark"></view>
+      <text class="article__brand-text">上号吧</text>
+    </view>
+    <view class="article__slogan">一键喊人，到点开黑</view>
+    <view class="article__h">这是什么</view>
+    <view class="article__p">面向熟人圈子的游戏组队小程序，解决「喊人开黑」召集低效的问题：发起房间 → 分享好友加入 → 全员准备 → 房主一键开始。</view>
+    <view class="article__h">支持的游戏</view>
+    <view class="article__p">无畏契约 · 三角洲行动 · CS2 · 英雄联盟 · 永劫无间</view>
+    <view class="article__h">隐私边界</view>
+    <view class="article__p">仅保存你主动填写的游戏昵称用于房间内展示，不收集任何游戏账号、密码。</view>
+  </view>
+
+  <!-- 隐私政策 -->
+  <view wx:if="{{tab === 'privacy'}}" class="article">
+    <view class="article__h">我们收集什么</view>
+    <view class="article__p">仅收集你主动填写的游戏昵称（用于房间内展示）与组队、聊天数据。不收集游戏账号密码、通讯录、位置等敏感信息。</view>
+    <view class="article__h">数据如何使用</view>
+    <view class="article__p">昵称与房间数据仅用于组队功能的正常运行，不会用于任何其他用途，也不会向第三方出售。</view>
+    <view class="article__h">数据如何删除</view>
+    <view class="article__p">房间在到期后自动清理；如需删除个人昵称数据，可通过「意见反馈」联系开发者处理。</view>
+  </view>
+
+  <!-- 使用条款 -->
+  <view wx:if="{{tab === 'terms'}}" class="article">
+    <view class="article__h">行为规范</view>
+    <view class="article__p">请友善组队、文明聊天。禁止发布违法违规、骚扰辱骂、广告引流等内容，违规房间将被解散。</view>
+    <view class="article__h">服务说明</view>
+    <view class="article__p">本小程序仅为玩家提供组队召集工具，不提供游戏账号交易、代练等服务；组队过程中产生的纠纷由玩家自行协商解决。</view>
+    <view class="article__h">条款变更</view>
+    <view class="article__p">条款如有更新将在本页面公示，继续使用即视为接受更新后的条款。</view>
+  </view>
+
+</view>

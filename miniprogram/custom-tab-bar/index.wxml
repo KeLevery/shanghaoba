@@ -1,0 +1,25 @@
+<!-- TabBar（参考图）：4 项，第 2 项「发起上号」为凸起青柠绿圆形＋ -->
+<view class="tabbar safe-area-bottom">
+  <view
+    wx:for="{{list}}"
+    wx:key="pagePath"
+    class="tabbar__item {{selected === index ? 'tabbar__item--active' : ''}} {{item.fab ? 'tabbar__item--fab' : ''}}"
+    data-path="{{item.pagePath}}"
+    data-index="{{index}}"
+    hover-class="tabbar__item--hover"
+    bindtap="switchTab"
+  >
+    <!-- 凸起＋按钮 -->
+    <view wx:if="{{item.fab}}" class="tabbar__fab">
+      <view class="tabbar__fab-plus"></view>
+    </view>
+    <!-- 图标（SVG，按选中态切换） -->
+    <image
+      wx:else
+      class="tabbar__icon"
+      src="./icons/{{item.icon}}{{selected === index ? '-active' : ''}}.svg"
+      mode="aspectFit"
+    />
+    <text class="tabbar__text">{{item.text}}</text>
+  </view>
+</view>

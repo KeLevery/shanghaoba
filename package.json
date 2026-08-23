@@ -4,6 +4,7 @@
   "private": true,
   "description": "上号吧小程序 · 单元测试工程（云函数 + 页面逻辑）",
   "scripts": {
+    "web": "node web/server.js",
     "test": "jest",
     "test:cloud": "jest tests/cloudfunctions",
     "test:miniprogram": "jest tests/miniprogram"

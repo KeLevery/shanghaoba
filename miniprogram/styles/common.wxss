@@ -1,0 +1,139 @@
+/* ============================================================
+ * common.wxss — 通用工具类（参考图深色青柠绿风格）
+ * 依赖 tokens.wxss，需在其后引入。
+ * ============================================================ */
+
+/* ---- 等宽计分数字 ---- */
+.num {
+  font-family: var(--shb-font-num);
+  font-weight: var(--shb-fw-bold);
+}
+
+/* ---- 布局 ---- */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-1 { flex: 1; min-width: 0; }
+.flex-shrink-0 { flex-shrink: 0; }
+
+/* ---- 文本截断 ---- */
+.text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- 安全区适配（底部 Home Indicator） ---- */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ---- 分区标题（青柠绿短竖条 + 白粗体） ---- */
+.sec-title {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  font-size: var(--shb-fs-lg);
+  font-weight: var(--shb-fw-bold);
+  color: var(--shb-text-primary);
+}
+.sec-title::before {
+  content: '';
+  width: 8rpx;
+  height: 28rpx;
+  border-radius: var(--shb-radius-sm);
+  background: var(--shb-color-primary);
+}
+
+/* ---- 胶囊（筛选 chips / 表单选项，激活 = 青柠绿填充深字） ---- */
+.pill {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 64rpx;
+  padding: 0 32rpx;
+  border-radius: var(--shb-radius-full);
+  background: var(--shb-bg-chip);
+  color: var(--shb-text-secondary);
+  font-size: var(--shb-fs-base);
+}
+.pill--active {
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  font-weight: var(--shb-fw-bold);
+}
+.pill--hover {
+  opacity: 0.75;
+}
+
+/* ---- 凹槽输入 ---- */
+.sunk-input {
+  width: 100%;
+  height: 84rpx;
+  padding: 0 28rpx;
+  box-sizing: border-box;
+  background: var(--shb-bg-elev);
+  border: none;
+  border-radius: var(--shb-radius-md);
+  font-size: var(--shb-fs-base);
+  color: var(--shb-text-primary);
+}
+.sunk-placeholder {
+  color: var(--shb-text-tertiary);
+}
+
+/* ---- 按钮 ---- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  font-size: var(--shb-fs-lg);
+  font-weight: var(--shb-fw-bold);
+  border-radius: var(--shb-radius-md);
+  box-sizing: border-box;
+}
+.btn--primary {
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  letter-spacing: 2rpx;
+}
+.btn--primary-hover { background: var(--shb-color-primary-pressed); }
+.btn--ghost {
+  background: var(--shb-bg-card);
+  border: 2rpx solid var(--shb-hairline-strong);
+  color: #d7dee6;
+}
+.btn--ghost-hover { opacity: 0.75; }
+.btn--outline-primary {
+  background: transparent;
+  border: 3rpx solid var(--shb-color-primary);
+  color: var(--shb-color-primary);
+}
+.btn--danger-link {
+  color: var(--shb-color-danger);
+  font-size: var(--shb-fs-md);
+  padding: 16rpx 24rpx;
+}
+
+/* ---- 状态点标签（圆点 + 文字） ---- */
+.tagdot {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-color-primary);
+}
+.tagdot::before {
+  content: '';
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: var(--shb-color-primary);
+}
+.tagdot--pending { color: var(--shb-color-pending); }
+.tagdot--pending::before { background: var(--shb-color-pending); }
+.tagdot--gray { color: var(--shb-text-tertiary); }
+.tagdot--gray::before { background: var(--shb-text-tertiary); }

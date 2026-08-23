@@ -1,3 +1,10 @@
 {
-  "navigationBarTitleText": "发起上号"
+  "navigationBarTitleText": "发起上号",
+  "navigationBarBackgroundColor": "#0b131b",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#0b131b",
+  "backgroundTextStyle": "light",
+  "usingComponents": {
+    "game-cover": "../../components/game-cover/game-cover"
+  }
 }

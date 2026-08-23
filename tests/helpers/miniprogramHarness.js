@@ -23,7 +23,9 @@ global.wx = global.wx || {};
 const wxState = {
   toasts: [],
   modals: [],
-  navigations: []
+  navigations: [],
+  switchTabs: [],
+  pullDownStops: 0
 };
 
 global.wx = {
@@ -35,6 +37,8 @@ global.wx = {
   redirectTo(o) { wxState.navigations.push(o); },
   navigateBack() { wxState.navigations.push({ back: true }); },
   reLaunch(o) { wxState.navigations.push(o); },
+  switchTab(o) { wxState.switchTabs.push(o); },
+  stopPullDownRefresh() { wxState.pullDownStops += 1; },
   requestSubscribeMessage: jest.fn().mockResolvedValue({}),
   showModal(o) { wxState.modals.push(o); if (o.success) o.success({ confirm: true, cancel: false }); },
   cloud: {
@@ -47,6 +51,8 @@ function reset() {
   wxState.toasts = [];
   wxState.modals = [];
   wxState.navigations = [];
+  wxState.switchTabs = [];
+  wxState.pullDownStops = 0;
   wx.cloud.callFunction = jest.fn().mockRejectedValue(new Error('callFunction 未 stub'));
   wx.requestSubscribeMessage = jest.fn().mockResolvedValue({});
   wx.cloud.database = jest.fn().mockImplementation(() => { throw new Error('database 未 stub'); });

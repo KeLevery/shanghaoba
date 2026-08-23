@@ -1,42 +1,149 @@
-<view class="container">
-  <view class="page-title">发起上号</view>
-  <view class="page-subtitle">建个房间，把朋友喊来一起玩</view>
+<!-- ============================================================
+  发起上号（参考图样式 · 单页表单）
+  游戏封面 2 列网格 → 人数步进+快捷档 → 模式 chips → 时间 chips → 备注
+  底部：发起上号主按钮（随内容滚动）
+============================================================ -->
+<view class="page">
 
-  <view class="card form-card">
-    <view class="form-item">
-      <text class="label">游戏 <text class="required">*</text></text>
-      <picker mode="selector" range="{{games}}" value="{{gameIndex}}" bindchange="onGameChange">
-        <view class="picker-value">{{games[gameIndex]}} <text>›</text></view>
-      </picker>
+  <view class="pagehead">发起上号</view>
+
+  <!-- 游戏选择：2 列封面网格 -->
+  <view class="formcard">
+    <view class="formcard__head">
+      <text class="formcard__title">选择游戏</text>
+      <text class="formcard__hint">切换时带入默认人数</text>
     </view>
-    <view class="divider"></view>
-    <view class="form-item">
-      <text class="label">模式 / 地图</text>
-      <input placeholder="例如：排位、竞技模式、匹配" maxlength="30" value="{{mode}}" bindinput="onModeInput" />
-    </view>
-    <view class="divider"></view>
-    <view class="form-item">
-      <text class="label">需要人数 <text class="required">*</text></text>
-      <view class="stepper">
-        <text class="step" bindtap="decrease">−</text>
-        <text class="number">{{maxPlayers}} 人</text>
-        <text class="step" bindtap="increase">＋</text>
+    <view class="ggrid">
+      <view
+        wx:for="{{games}}"
+        wx:key="name"
+        class="gitem {{gameIndex === index ? 'gitem--active' : ''}}"
+        data-index="{{index}}"
+        hover-class="gitem--hover"
+        bindtap="onGameTap"
+      >
+        <view class="gitem__cover">
+          <game-cover game="{{item.name}}" />
+        </view>
+        <view class="gitem__row">
+          <text class="gitem__name">{{item.name}}</text>
+          <text class="gitem__def num">{{item.defaultPlayers}}人</text>
+        </view>
+        <view wx:if="{{gameIndex === index}}" class="gitem__check">✓</view>
       </view>
-    </view>
-    <view class="divider"></view>
-    <view class="form-item">
-      <text class="label">开打时间 <text class="required">*</text></text>
-      <picker mode="selector" range="{{timeOptions}}" value="{{timeIndex}}" bindchange="onTimeChange">
-        <view class="picker-value">{{timeOptions[timeIndex]}} <text>›</text></view>
-      </picker>
-    </view>
-    <view class="divider"></view>
-    <view class="form-item remark-item">
-      <text class="label">备注</text>
-      <textarea placeholder="有什么想说的？" maxlength="100" value="{{remark}}" bindinput="onRemarkInput" auto-height />
     </view>
   </view>
 
-  <button class="primary-button" bindtap="submit" loading="{{submitting}}">发起召集</button>
-  <view class="tip">房间 2 小时无活动后会自动解散</view>
+  <!-- 队伍人数 -->
+  <view class="formcard">
+    <view class="formcard__head">
+      <text class="formcard__title">队伍人数</text>
+      <text class="formcard__hint">2 – 20 人</text>
+    </view>
+    <view class="stepper">
+      <view class="stepper__btn" hover-class="stepper__btn--hover" bindtap="decrease">−</view>
+      <view class="stepper__val">
+        <text class="num stepper__num">{{maxPlayers}}</text>
+        <text class="stepper__unit">人</text>
+      </view>
+      <view class="stepper__btn" hover-class="stepper__btn--hover" bindtap="increase">＋</view>
+    </view>
+    <view class="qnums">
+      <view
+        wx:for="{{quickNums}}"
+        wx:key="*this"
+        class="qnums__item num {{maxPlayers === item ? 'qnums__item--active' : ''}}"
+        data-value="{{item}}"
+        hover-class="qnums__item--hover"
+        bindtap="onQuickNumTap"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 模式 / 地图 -->
+  <view class="formcard">
+    <view class="formcard__head">
+      <text class="formcard__title">模式 / 地图</text>
+      <text class="formcard__hint">30 字以内</text>
+    </view>
+    <view class="fchips">
+      <view
+        wx:for="{{modePresets}}"
+        wx:key="*this"
+        class="pill {{modePresetIndex === index ? 'pill--active' : ''}}"
+        data-index="{{index}}"
+        hover-class="pill--hover"
+        bindtap="onModeChipTap"
+      >{{item === '自定义' ? '自定义…' : item}}</view>
+    </view>
+    <view wx:if="{{modePresetIndex === modePresets.length - 1}}" class="formcard__input">
+      <input
+        class="sunk-input"
+        placeholder="自定义模式/地图，如 5v5 · 亚海悬城"
+        placeholder-class="sunk-placeholder"
+        maxlength="30"
+        value="{{mode}}"
+        bindinput="onModeInput"
+      />
+    </view>
+  </view>
+
+  <!-- 开打时间 -->
+  <view class="formcard">
+    <view class="formcard__head">
+      <text class="formcard__title">开打时间</text>
+    </view>
+    <view class="fchips">
+      <view
+        wx:for="{{timeOptions}}"
+        wx:key="*this"
+        class="pill {{timeIndex === index ? 'pill--active' : ''}}"
+        data-index="{{index}}"
+        hover-class="pill--hover"
+        bindtap="onTimeTap"
+      >{{item === '自定义时间' ? '自定义…' : item}}</view>
+    </view>
+    <!-- 选「自定义」时露出自由输入（与模式自定义一致的交互） -->
+    <view wx:if="{{timeIndex === timeOptions.length - 1}}" class="formcard__input">
+      <input
+        class="sunk-input"
+        placeholder="填写时间，如：今晚十点 / 周六 20:30"
+        placeholder-class="sunk-placeholder"
+        maxlength="20"
+        value="{{customTime}}"
+        bindinput="onCustomTimeInput"
+      />
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="formcard">
+    <view class="formcard__head">
+      <text class="formcard__title">备注</text>
+      <text class="formcard__hint">选填</text>
+    </view>
+    <textarea
+      class="formcard__textarea"
+      placeholder="补充说明，如：来听指挥的、段位不限"
+      placeholder-class="sunk-placeholder"
+      maxlength="100"
+      value="{{remark}}"
+      bindinput="onRemarkInput"
+    />
+    <view class="formcard__count num">{{remark.length}} / 100</view>
+  </view>
+
+  <!-- 发起按钮（随内容流动，参考图样式） -->
+  <view class="submitbar">
+    <button
+      class="btn btn--primary submitbar__btn"
+      hover-class="btn--primary-hover"
+      disabled="{{submitting}}"
+      bindtap="submit"
+    >{{submitting ? '发起中…' : '发起上号'}}</button>
+    <text class="submitbar__sum">{{games[gameIndex].name}}{{mode ? ' · ' + mode : ''}} · {{maxPlayers}} 人房 · {{timeLabel}}</text>
+  </view>
+
+  <!-- 底部留白（自定义 TabBar 让位） -->
+  <view class="page-tail"></view>
 </view>

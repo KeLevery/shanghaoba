@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "消息",
+  "navigationBarBackgroundColor": "#0b131b",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#0b131b",
+  "usingComponents": {
+    "empty-state": "../../components/empty-state/empty-state",
+    "status-tag": "../../components/status-tag/status-tag"
+  },
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "light"
+}

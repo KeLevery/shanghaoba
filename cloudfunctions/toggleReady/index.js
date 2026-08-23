@@ -3,7 +3,7 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
+const { STATUS } = require('./_shared/constants');
 
 exports.main = async (event) => {
   const openid = cloud.getWXContext().OPENID;
@@ -18,6 +18,9 @@ exports.main = async (event) => {
       throw new Error('房间不存在或已关闭');
     }
     if (room.status === STATUS.DISSOLVED) throw new Error('房间已解散');
+    // 已开打（ready）后锁定准备状态：此时取消准备会把状态倒退回招募中，
+    // 出现「已开打但房主未准备」的矛盾展示
+    if (room.status === STATUS.READY) throw new Error('已开打，不能再修改准备状态');
 
     const memberRes = await transaction.collection('participants')
       .where({ roomId, openid })
@@ -35,7 +38,7 @@ exports.main = async (event) => {
     const status = allReady ? STATUS.PENDING : STATUS.RECRUITING;
 
     await transaction.collection('rooms').doc(roomId).update({
-      data: { status, updatedAt: now, allReadyAt: allReady ? now : null }
+      data: { status, updatedAt: now, lastActiveAt: now, allReadyAt: allReady ? now : null }
     });
 
     return { ready, allReady, status };

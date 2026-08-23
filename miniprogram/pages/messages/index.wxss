@@ -1,0 +1,128 @@
+@import '../../styles/tokens.wxss';
+@import '../../styles/common.wxss';
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: 40rpx;
+  background: var(--shb-bg-page);
+}
+
+.page-tail {
+  height: 180rpx;
+}
+
+.pagehead {
+  padding: 16rpx 36rpx 8rpx;
+  font-size: var(--shb-fs-xxl);
+  font-weight: var(--shb-fw-bold);
+  color: var(--shb-text-primary);
+}
+
+.loading {
+  padding: 120rpx 0;
+  text-align: center;
+  font-size: var(--shb-fs-lg);
+  color: var(--shb-text-tertiary);
+  letter-spacing: 12rpx;
+}
+
+.mlist {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding: 24rpx 36rpx 0;
+}
+
+/* 消息卡：封面 + 房间/预览 + 计分与状态 */
+.mrow {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  background: var(--shb-bg-card);
+  border-radius: var(--shb-radius-lg);
+  padding: 28rpx;
+}
+
+.mrow--hover {
+  background: var(--shb-bg-elev);
+}
+
+.mrow__cover {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: var(--shb-radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mrow__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.mrow__top {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+}
+
+.mrow__title {
+  font-size: var(--shb-fs-base);
+  font-weight: var(--shb-fw-bold);
+  color: var(--shb-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.mrow__mode {
+  font-size: var(--shb-fs-sm);
+  font-weight: var(--shb-fw-medium);
+  color: var(--shb-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.mrow__time {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-text-tertiary);
+  font-weight: var(--shb-fw-medium);
+}
+
+.mrow__preview {
+  margin-top: 10rpx;
+  font-size: var(--shb-fs-sm);
+  color: var(--shb-text-secondary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mrow__preview--empty {
+  color: var(--shb-text-tertiary);
+}
+
+.mrow__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14rpx;
+  flex-shrink: 0;
+}
+
+.mrow__count {
+  font-size: var(--shb-fs-base);
+  color: var(--shb-text-primary);
+}
+
+.mrow__count-max {
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-text-tertiary);
+  font-weight: var(--shb-fw-medium);
+}

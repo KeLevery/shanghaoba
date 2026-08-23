@@ -3,13 +3,7 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const STATUS_TEXT = {
-  recruiting: '招募中',
-  full: '已满',
-  pending: '待房主开始',
-  ready: '全员就绪 · 可以开打',
-  dissolved: '已解散'
-};
+const { STATUS, STATUS_TEXT } = require('./_shared/constants');
 
 function roomInfo(room, participant, memberCount) {
   const isHost = room.hostOpenid === participant.openid;
@@ -56,7 +50,7 @@ exports.main = async () => {
   });
 
   const rooms = roomRes.data
-    .filter(room => room.status !== 'dissolved')
+    .filter(room => room.status !== STATUS.DISSOLVED)
     .map(room => roomInfo(room, participantByRoomId[room._id], memberCountByRoomId[room._id] || 0))
     .sort((a, b) => {
       if (a.isHost !== b.isHost) return a.isHost ? -1 : 1;

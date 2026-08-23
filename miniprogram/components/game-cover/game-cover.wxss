@@ -1,0 +1,51 @@
+@import '../../styles/tokens.wxss';
+
+.game-cover {
+  width: 100%;
+  height: 100%;
+}
+
+.game-cover__img,
+.game-cover__fallback {
+  width: 100%;
+  height: 100%;
+}
+
+/* 降级底：渐变 + 顶部柔光 */
+.game-cover__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-cover__fallback::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 50%);
+  pointer-events: none;
+}
+
+/* 首字徽章：半透圆底 + 白描边 + 字重 */
+.game-cover__badge {
+  position: relative;
+  z-index: 1;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 14, 18, 0.32);
+  border: 2rpx solid rgba(255,255,255,0.25);
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.25), inset 0 1rpx 2rpx rgba(255,255,255,0.15);
+}
+
+.game-cover__initial {
+  color: rgba(255,255,255,0.97);
+  font-size: 42rpx;
+  font-weight: 800;
+  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
+}

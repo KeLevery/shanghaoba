@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "game-cover": "../game-cover/game-cover"
+  }
+}

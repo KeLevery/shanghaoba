@@ -3,20 +3,23 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const ROOM_EXPIRE_MS = 2 * 60 * 60 * 1000; // 2 小时无活动自动过期
-const STATUS = { RECRUITING: 'recruiting', FULL: 'full', PENDING: 'pending', READY: 'ready', DISSOLVED: 'dissolved' };
-const VALID_GAMES = ['无畏契约', '三角洲行动', 'CS2', '英雄联盟', '永劫无间'];
-const VALID_TIME_LABELS = ['现在开打', '今晚', '明天', '自定义时间'];
+// 公共常量与校验逻辑（副本由 cloudfunctions/_shared/sync.js 同步维护）
+const {
+  STATUS, ROOM_EXPIRE_MS,
+  MODE_MAX_LENGTH, REMARK_MAX_LENGTH, START_TIME_MAX_LENGTH
+} = require('./_shared/constants');
+const { assertValidGame, assertMaxPlayers, assertStartTimeLabel, trimAndSlice } = require('./_shared/validate');
 
 exports.main = async (event) => {
   const { game, mode, maxPlayers, remark, startTimeLabel } = event;
   const openid = cloud.getWXContext().OPENID;
 
-  if (!VALID_GAMES.includes(game)) throw new Error('不支持的游戏');
-  if (!Number.isInteger(maxPlayers) || maxPlayers < 2 || maxPlayers > 20) throw new Error('人数需在 2-20 之间');
-  if (!VALID_TIME_LABELS.includes(startTimeLabel)) throw new Error('开打时间无效');
-  const cleanMode = String(mode || '').trim().slice(0, 30);
-  const cleanRemark = String(remark || '').trim().slice(0, 100);
+  assertValidGame(game);
+  assertMaxPlayers(maxPlayers);
+  assertStartTimeLabel(startTimeLabel);
+  const cleanMode = trimAndSlice(mode, MODE_MAX_LENGTH);
+  const cleanRemark = trimAndSlice(remark, REMARK_MAX_LENGTH);
+  const cleanStartTimeLabel = trimAndSlice(startTimeLabel, START_TIME_MAX_LENGTH);
 
   const now = Date.now();
   let roomId;
@@ -27,7 +30,7 @@ exports.main = async (event) => {
         mode: cleanMode,
         maxPlayers,
         remark: cleanRemark,
-        startTimeLabel,
+        startTimeLabel: cleanStartTimeLabel,
         hostOpenid: openid,
         status: STATUS.RECRUITING,
         createdAt: now,

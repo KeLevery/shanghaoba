@@ -1,5 +1,16 @@
 {
   "navigationBarTitleText": "房间详情",
+  "navigationBarBackgroundColor": "#0b131b",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#0b131b",
   "enableShareAppMessage": true,
-  "enableShareTimeline": true
+  "enableShareTimeline": true,
+  "usingComponents": {
+    "member-item": "../../components/member-item/member-item",
+    "chat-bubble": "../../components/chat-bubble/chat-bubble",
+    "status-tag": "../../components/status-tag/status-tag",
+    "empty-state": "../../components/empty-state/empty-state",
+    "game-cover": "../../components/game-cover/game-cover"
+  },
+  "backgroundTextStyle": "light"
 }

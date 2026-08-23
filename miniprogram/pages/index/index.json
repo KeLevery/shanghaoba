@@ -1,3 +1,12 @@
 {
-  "navigationBarTitleText": "上号吧"
+  "navigationBarTitleText": "招募大厅",
+  "navigationBarBackgroundColor": "#0b131b",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#0b131b",
+  "backgroundTextStyle": "light",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "room-card": "../../components/room-card/room-card",
+    "empty-state": "../../components/empty-state/empty-state"
+  }
 }

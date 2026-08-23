@@ -114,7 +114,20 @@ const db = {
       }
     };
   },
-  async runTransaction(fn) { return fn(this); }
+  // 事务：执行前对全部集合做快照，回调抛错时回滚到快照，模拟真实事务的原子性
+  async runTransaction(fn) {
+    const snapshot = {};
+    Object.keys(collections).forEach((name) => {
+      snapshot[name] = collections[name].map((doc) => ({ ...doc }));
+    });
+    try {
+      return await fn(this);
+    } catch (error) {
+      Object.keys(collections).forEach((name) => delete collections[name]);
+      Object.keys(snapshot).forEach((name) => { collections[name] = snapshot[name]; });
+      throw error;
+    }
+  }
 };
 
 const cloud = {

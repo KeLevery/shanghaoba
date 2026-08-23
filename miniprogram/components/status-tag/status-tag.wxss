@@ -1,0 +1,58 @@
+@import '../../styles/tokens.wxss';
+@import '../../styles/common.wxss';
+
+/* 宿主随内容行内排布 */
+:host {
+  display: inline-flex;
+}
+
+/* 状态标：软底胶囊（进行中 = 青柠绿实底） */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 6rpx 18rpx;
+  font-size: var(--shb-fs-xs);
+  line-height: 32rpx;
+  border-radius: var(--shb-radius-full);
+  letter-spacing: 1rpx;
+  white-space: nowrap;
+}
+
+.status-tag::before {
+  content: '';
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+}
+
+.status-tag--recruiting {
+  color: var(--shb-color-primary);
+  background: var(--shb-color-primary-soft);
+}
+.status-tag--recruiting::before { background: var(--shb-color-primary); }
+
+.status-tag--pending {
+  color: var(--shb-color-pending);
+  background: var(--shb-color-pending-soft);
+}
+.status-tag--pending::before { background: var(--shb-color-pending); }
+
+.status-tag--ready {
+  color: var(--shb-text-inverse);
+  background: var(--shb-color-primary);
+  font-weight: var(--shb-fw-bold);
+}
+.status-tag--ready::before { background: var(--shb-text-inverse); }
+
+.status-tag--full {
+  color: var(--shb-text-secondary);
+  background: var(--shb-bg-chip);
+}
+.status-tag--full::before { background: var(--shb-text-tertiary); }
+
+.status-tag--dissolved {
+  color: var(--shb-text-tertiary);
+  background: var(--shb-bg-chip);
+}
+.status-tag--dissolved::before { background: var(--shb-text-tertiary); }
