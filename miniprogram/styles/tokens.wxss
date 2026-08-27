@@ -39,6 +39,19 @@ page {
   /* ---- 描边 / 分隔线 ---- */
   --shb-hairline: rgba(255, 255, 255, 0.07);
   --shb-hairline-strong: #2a3540;
+  --shb-border-subtle: 1rpx solid rgba(255, 255, 255, 0.07);
+  --shb-border-focus: 2rpx solid var(--shb-color-primary);
+
+  /* ---- 阴影与微光 ---- */
+  --shb-shadow-sm: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+  --shb-shadow-card: 0 8rpx 28rpx rgba(0, 0, 0, 0.45);
+  --shb-shadow-elev: 0 16rpx 40rpx rgba(0, 0, 0, 0.6);
+  --shb-shadow-glow: 0 0 28rpx rgba(192, 232, 99, 0.28);
+  --shb-shadow-glow-danger: 0 0 28rpx rgba(255, 92, 108, 0.25);
+
+  /* ---- 玻璃拟态半透明底 ---- */
+  --shb-glass-card: rgba(21, 29, 38, 0.88);
+  --shb-glass-bar: rgba(13, 21, 29, 0.92);
 
   /* ---- 字号阶梯（rpx） ---- */
   --shb-fs-xs: 20rpx;   /* 角标/元信息 */
@@ -55,9 +68,11 @@ page {
   --shb-fw-bold: 700;
 
   /* ---- 圆角（卡片大圆角 + 胶囊全圆） ---- */
-  --shb-radius-sm: 8rpx;
-  --shb-radius-md: 24rpx;
-  --shb-radius-lg: 32rpx;
+  --shb-radius-xs: 8rpx;
+  --shb-radius-sm: 14rpx;
+  --shb-radius-md: 20rpx;
+  --shb-radius-lg: 28rpx;
+  --shb-radius-xl: 36rpx;
   --shb-radius-full: 999rpx;
 
   /* ---- 间距阶梯 ---- */
@@ -68,5 +83,5 @@ page {
   --shb-space-xl: 40rpx;
 
   /* ---- 等宽数字字体（计分板） ---- */
-  --shb-font-num: "SF Mono", Menlo, Consolas, "Courier New", monospace;
+  --shb-font-num: "SF Pro Display", "SF Mono", Menlo, Consolas, "PingFang SC", monospace;
 }

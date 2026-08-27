@@ -10,7 +10,9 @@
     "chat-bubble": "../../components/chat-bubble/chat-bubble",
     "status-tag": "../../components/status-tag/status-tag",
     "empty-state": "../../components/empty-state/empty-state",
-    "game-cover": "../../components/game-cover/game-cover"
+    "game-cover": "../../components/game-cover/game-cover",
+    "segmented-tabs": "../../components/segmented-tabs/segmented-tabs",
+    "custom-dialog": "../../components/custom-dialog/custom-dialog"
   },
   "backgroundTextStyle": "light"
 }

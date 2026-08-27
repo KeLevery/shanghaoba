@@ -26,9 +26,9 @@
   </view>
 
   <!-- 关于上号吧 -->
-  <view wx:if="{{tab === 'about'}}" class="article">
+  <view wx:if="{{tab === 'about'}}" class="article esports-card">
     <view class="article__brand">
-      <view class="article__brand-mark"></view>
+      <view class="article__brand-mark pulse-glow"></view>
       <text class="article__brand-text">上号吧</text>
     </view>
     <view class="article__slogan">一键喊人，到点开黑</view>
@@ -41,7 +41,7 @@
   </view>
 
   <!-- 隐私政策 -->
-  <view wx:if="{{tab === 'privacy'}}" class="article">
+  <view wx:if="{{tab === 'privacy'}}" class="article esports-card">
     <view class="article__h">我们收集什么</view>
     <view class="article__p">仅收集你主动填写的游戏昵称（用于房间内展示）与组队、聊天数据。不收集游戏账号密码、通讯录、位置等敏感信息。</view>
     <view class="article__h">数据如何使用</view>
@@ -51,7 +51,7 @@
   </view>
 
   <!-- 使用条款 -->
-  <view wx:if="{{tab === 'terms'}}" class="article">
+  <view wx:if="{{tab === 'terms'}}" class="article esports-card">
     <view class="article__h">行为规范</view>
     <view class="article__p">请友善组队、文明聊天。禁止发布违法违规、骚扰辱骂、广告引流等内容，违规房间将被解散。</view>
     <view class="article__h">服务说明</view>

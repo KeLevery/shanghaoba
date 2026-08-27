@@ -5,10 +5,25 @@
 ============================================================ -->
 <view class="page" wx:if="{{room}}">
 
-  <view class="pagehead">房间详情</view>
+  <!-- 页眉：大标题 + 一眼可见的醒目解散/退出房间按钮 -->
+  <view class="pagehead pagehead--flex">
+    <text class="pagehead__title">房间详情</text>
+    <view
+      wx:if="{{isHost}}"
+      class="quick-danger-btn press-scale"
+      hover-class="quick-danger-btn--hover"
+      bindtap="dissolveRoom"
+    >解散房间</view>
+    <view
+      wx:else
+      class="quick-danger-btn press-scale"
+      hover-class="quick-danger-btn--hover"
+      bindtap="leaveRoom"
+    >退出房间</view>
+  </view>
 
   <!-- 房间档案卡：封面 + 标题/meta + 满员进度条 -->
-  <view class="dossier">
+  <view class="dossier esports-card">
     <view class="dossier__cover">
       <game-cover game="{{room.game}}" />
     </view>
@@ -19,7 +34,7 @@
         <status-tag class="dossier__tag" status="{{room.status}}" />
       </view>
       <view class="dossier__meta">
-        <text class="dossier__meta-strong">{{room.startTimeLabel}}</text>
+        <text class="dossier__meta-strong">开打时间：{{room.startTimeLabel}}</text>
         <text> · 房主 </text>
         <text class="dossier__meta-strong">{{hostName || '神秘玩家'}}</text>
       </view>
@@ -31,102 +46,142 @@
         <text class="num">{{participants.length}} / {{room.maxPlayers}} 人</text>
         <text class="dossier__pready"><text class="num">{{readyCount}}</text> 人已准备</text>
       </view>
-      <!-- 邀请码：无码（历史存量房）时隐藏；点击整行复制 -->
-      <view wx:if="{{room.inviteCode}}" class="dossier__code" hover-class="dossier__code--hover" bindtap="copyInvite">
+      <!-- 邀请码：点击整行复制 -->
+      <view wx:if="{{room.inviteCode}}" class="dossier__code press-scale" hover-class="dossier__code--hover" bindtap="copyInvite">
         <text class="dossier__code-label">邀请码</text>
         <text class="num dossier__code-val">{{room.inviteCode}}</text>
-        <text class="dossier__code-copy">复制</text>
+        <text class="dossier__code-copy">点此复制 📋</text>
       </view>
     </view>
   </view>
 
-  <!-- 全员已准备提示条（仅 pending 态） -->
-  <view wx:if="{{room.isPendingState}}" class="notice">
-    <text>⚡ 全员已准备，{{isHost ? '随时可以开打' : '等待房主开始'}}</text>
+  <!-- 全员已准备提示条（仅 pending 态，脉冲光感） -->
+  <view wx:if="{{room.isPendingState}}" class="notice pulse-glow">
+    <text>⚡ 全员已准备，{{isHost ? '随时可以开打！' : '等待房主点击开始'}}</text>
   </view>
 
-  <!-- 准备板 -->
-  <view class="board">
-    <view class="board__head">
-      <view class="sec-title">准备板</view>
-      <view class="board__count"><text class="num board__ready">{{readyCount}}</text><text class="num"> / {{participants.length}}</text><text> 人已准备</text></view>
-    </view>
-    <member-item
-      wx:for="{{participants}}"
-      wx:key="openid"
-      openid="{{item.openid}}"
-      displayName="{{item.displayName}}"
-      isHost="{{item.isHost}}"
-      ready="{{item.ready}}"
-      canRemove="{{isHost}}"
-      bind:remove="onRemoveMember"
-    />
-    <!-- 空位占位行 -->
-    <member-item
-      wx:for="{{emptySlots}}"
-      wx:key="*this"
-      isEmpty="{{true}}"
-      slotIndex="{{item}}"
+  <!-- 核心作战室分段导航：成员 / 聊天 / 设置 -->
+  <view class="room-tabs">
+    <segmented-tabs
+      tabs="{{tabs}}"
+      current="{{activeTab}}"
+      bind:change="onTabChange"
     />
   </view>
 
-  <!-- 聊天（常驻） -->
-  <view class="chat">
-    <scroll-view scroll-y class="chat__list" scroll-into-view="{{lastMessageId}}" scroll-with-animation>
-      <view wx:if="{{!messages.length}}" class="chat__empty">还没有消息，喊一嗓子让大家准备</view>
-      <view wx:for="{{messages}}" wx:key="_id" id="msg-{{item._id}}" class="chat__item">
-        <chat-bubble
-          content="{{item.content}}"
-          displayName="{{item.displayName}}"
-          createdAt="{{item.createdAt}}"
-          isSelf="{{item.isSelf}}"
-        />
+  <!-- Tab 0: 成员准备板（独立判断，杜绝任何环境穿透） -->
+  <view wx:if="{{activeTab === 0}}" class="tab-panel">
+    <view class="board esports-card">
+      <view class="board__head">
+        <view class="sec-title">战队成员</view>
+        <view class="board__count">
+          <text class="num board__ready">{{readyCount}}</text>
+          <text class="num"> / {{participants.length}}</text>
+          <text> 人就绪</text>
+        </view>
       </view>
-    </scroll-view>
-    <view class="chat__bar">
-      <input
-        class="chat__input"
-        placeholder="说点什么…"
-        placeholder-class="sunk-placeholder"
-        maxlength="200"
-        confirm-type="send"
-        adjust-position="{{true}}"
-        value="{{messageContent}}"
-        bindinput="onMessageInput"
-        bindconfirm="sendMessage"
+      <member-item
+        wx:for="{{participants}}"
+        wx:key="openid"
+        openid="{{item.openid}}"
+        displayName="{{item.displayName}}"
+        isHost="{{item.isHost}}"
+        ready="{{item.ready}}"
+        canRemove="{{isHost}}"
+        bind:remove="onRemoveMember"
       />
-      <view
-        class="chat__send num {{messageContent ? '' : 'chat__send--disabled'}}"
-        hover-class="chat__send--hover"
-        bindtap="sendMessage"
-      >发送</view>
+      <!-- 空位占位行 -->
+      <member-item
+        wx:for="{{emptySlots}}"
+        wx:key="*this"
+        isEmpty="{{true}}"
+        slotIndex="{{item}}"
+      />
     </view>
   </view>
 
-  <!-- 危险操作（软红底实感按钮，不再弱化为文字链接） -->
-  <view class="danger-zone">
-    <view wx:if="{{isHost}}" class="btn btn--danger danger-zone__btn" hover-class="btn--danger-hover" bindtap="dissolveRoom">解散房间</view>
-    <view wx:else class="btn btn--danger danger-zone__btn" hover-class="btn--danger-hover" bindtap="leaveRoom">退出房间</view>
+  <!-- Tab 1: 战术文字聊天（独立判断） -->
+  <view wx:if="{{activeTab === 1}}" class="tab-panel">
+    <view class="chat esports-card">
+      <scroll-view scroll-y class="chat__list" scroll-into-view="{{lastMessageId}}" scroll-with-animation>
+        <view wx:if="{{!messages.length}}" class="chat__empty">还没有战术留言，喊一嗓子让大家准备开黑！</view>
+        <view wx:for="{{messages}}" wx:key="_id" id="msg-{{item._id}}" class="chat__item">
+          <chat-bubble
+            content="{{item.content}}"
+            displayName="{{item.displayName}}"
+            createdAt="{{item.createdAt}}"
+            isSelf="{{item.isSelf}}"
+          />
+        </view>
+      </scroll-view>
+      <view class="chat__bar">
+        <input
+          class="chat__input"
+          placeholder="发送战术留言…"
+          placeholder-class="sunk-placeholder"
+          maxlength="200"
+          confirm-type="send"
+          adjust-position="{{true}}"
+          value="{{messageContent}}"
+          bindinput="onMessageInput"
+          bindconfirm="sendMessage"
+        />
+        <view
+          class="chat__send num press-scale {{messageContent ? '' : 'chat__send--disabled'}}"
+          hover-class="chat__send--hover"
+          bindtap="sendMessage"
+        >发送</view>
+      </view>
+    </view>
   </view>
 
-  <!-- 底部占位，避免内容被操作栏遮挡 -->
+  <!-- Tab 2: 房间设置与管理（独立判断） -->
+  <view wx:if="{{activeTab === 2}}" class="tab-panel">
+    <view class="setcard esports-card">
+      <view class="setcard__title">房间信息</view>
+      <view class="setcard__row">
+        <text class="setcard__label">游戏名称</text>
+        <text class="setcard__val">{{room.game}}</text>
+      </view>
+      <view class="setcard__row">
+        <text class="setcard__label">模式地图</text>
+        <text class="setcard__val">{{room.mode || '默认模式'}}</text>
+      </view>
+      <view class="setcard__row">
+        <text class="setcard__label">房主</text>
+        <text class="setcard__val">{{hostName || '神秘玩家'}}</text>
+      </view>
+      <view class="setcard__row" wx:if="{{room.inviteCode}}" bindtap="copyInvite">
+        <text class="setcard__label">邀请码</text>
+        <text class="setcard__val num text-primary">{{room.inviteCode}} (点击复制)</text>
+      </view>
+    </view>
+
+    <!-- 设置区内亦保留危险操作按钮 -->
+    <view class="danger-zone">
+      <view wx:if="{{isHost}}" class="btn btn--danger danger-zone__btn press-scale" hover-class="btn--danger-hover" bindtap="dissolveRoom">解散房间</view>
+      <view wx:else class="btn btn--danger danger-zone__btn press-scale" hover-class="btn--danger-hover" bindtap="leaveRoom">退出房间</view>
+    </view>
+  </view>
+
+  <!-- 底部占位，避免内容被固定操作栏遮挡 -->
   <view class="page-tail"></view>
 
   <!-- 底部固定操作栏：邀请（分享） / 准备 / 开始（房主且 pending） -->
   <view class="action-bar safe-area-bottom">
-    <button class="btn btn--ghost action-bar__btn action-bar__btn--invite" hover-class="btn--ghost-hover" open-type="share">邀请</button>
+    <button class="btn btn--ghost action-bar__btn action-bar__btn--invite press-scale" hover-class="btn--ghost-hover" open-type="share">邀请好友</button>
 
     <!-- 准备 / 取消准备（房主与队员均可；开打后锁定，不再显示） -->
     <block wx:if="{{!room.isReadyState}}">
       <view
         wx:if="{{!myReady}}"
-        class="btn btn--primary action-bar__btn"
+        class="btn btn--primary action-bar__btn press-scale"
         hover-class="btn--primary-hover"
         bindtap="toggleReady"
       >我准备好了</view>
       <view
         wx:else
-        class="btn btn--outline-primary action-bar__btn"
+        class="btn btn--outline-primary action-bar__btn press-scale"
         hover-class="btn--ghost-hover"
         bindtap="toggleReady"
       >取消准备</view>
@@ -135,7 +190,7 @@
     <!-- 开始游戏：仅房主且 pending 态显示 -->
     <view
       wx:if="{{isHost && room.isPendingState}}"
-      class="btn btn--primary action-bar__btn"
+      class="btn btn--primary action-bar__btn press-scale"
       hover-class="btn--primary-hover"
       bindtap="startRoom"
     >开始游戏</view>

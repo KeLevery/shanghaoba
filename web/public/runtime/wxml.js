@@ -61,6 +61,12 @@ WMP.wxml = (function () {
     parent.children.push({ tag: '#text', text: raw });
   }
 
+  function isBlankTextNode(c) {
+    if (!c || c.tag !== '#text') return false;
+    var t = (c.attrs && c.attrs.text) || '';
+    return /^\s*$/.test(t);
+  }
+
   // 把 wx:if / wx:elif / wx:else 兄弟节点折叠成条件组
   function groupIfs(node) {
     var children = node.children;
@@ -70,23 +76,31 @@ WMP.wxml = (function () {
       if (child.tag !== '#text' && child.attrs && 'wx:if' in child.attrs) {
         var group = { tag: '#if', branches: [{ cond: child.attrs['wx:if'], node: stripIf(child) }], elseNode: null };
         out.push(group);
-        while (
-          out[out.length - 1] === group &&
-          idx + 1 < children.length &&
-          children[idx + 1].attrs &&
-          ('wx:elif' in children[idx + 1].attrs)
-        ) {
-          idx++;
-          group.branches.push({ cond: children[idx].attrs['wx:elif'], node: stripIf(children[idx]) });
+        while (idx + 1 < children.length) {
+          var nextNode = children[idx + 1];
+          if (isBlankTextNode(nextNode)) {
+            idx++; // 忽略中间空行与空白
+            continue;
+          }
+          if (nextNode.attrs && ('wx:elif' in nextNode.attrs)) {
+            idx++;
+            group.branches.push({ cond: nextNode.attrs['wx:elif'], node: stripIf(nextNode) });
+            continue;
+          }
+          break;
         }
-        while (
-          out[out.length - 1] === group && !group.elseNode &&
-          idx + 1 < children.length &&
-          children[idx + 1].attrs &&
-          ('wx:else' in children[idx + 1].attrs)
-        ) {
-          idx++;
-          group.elseNode = stripIf(children[idx]);
+        while (idx + 1 < children.length && !group.elseNode) {
+          var nextNode2 = children[idx + 1];
+          if (isBlankTextNode(nextNode2)) {
+            idx++;
+            continue;
+          }
+          if (nextNode2.attrs && ('wx:else' in nextNode2.attrs)) {
+            idx++;
+            group.elseNode = stripIf(nextNode2);
+            break;
+          }
+          break;
         }
         // 关键：递归处理各分支内部的条件指令
         group.branches.forEach(function (b) { groupIfs(b.node); });
@@ -621,11 +635,13 @@ WMP.wxml = (function () {
     }
     applyEl(el, vn, old);
     if (vn.k === 'comp') {
-      // 组件复用：更新属性（触发 observers）
-      if (vn.instance) {
-        updateComp(vn.instance, vn);
-        vn.instance._hostVn = vn;
-        // 组件内部自行调度重渲染
+      // 组件复用：继承旧实例，更新宿主指针并同步属性（触发 observers 和 scheduleRender）
+      var inst = old.instance;
+      vn.instance = inst;
+      if (inst) {
+        inst._hostVn = vn;
+        inst._hostEl = el;
+        updateComp(inst, vn);
       }
       return el;
     }

@@ -1,0 +1,119 @@
+@import '../../styles/tokens.wxss';
+
+.dialog-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.dialog-mask--show {
+  opacity: 1;
+}
+
+.dialog-card {
+  width: 100%;
+  max-width: 600rpx;
+  background: #151e28;
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--shb-radius-xl);
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  position: relative;
+  transform: scale(0.92);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dialog-card--show {
+  transform: scale(1);
+}
+
+.dialog-accent {
+  height: 6rpx;
+  width: 100%;
+  background: var(--shb-color-primary);
+  box-shadow: 0 0 12rpx var(--shb-color-primary);
+}
+
+.dialog-accent--danger {
+  background: var(--shb-color-danger);
+  box-shadow: 0 0 12rpx var(--shb-color-danger);
+}
+
+.dialog-head {
+  padding: 36rpx 36rpx 16rpx;
+  text-align: center;
+}
+
+.dialog-title {
+  font-size: var(--shb-fs-xl);
+  font-weight: var(--shb-fw-bold);
+  color: #ffffff;
+  letter-spacing: 1rpx;
+}
+
+.dialog-body {
+  padding: 12rpx 40rpx 36rpx;
+  text-align: center;
+}
+
+.dialog-content {
+  font-size: var(--shb-fs-base);
+  color: var(--shb-text-secondary);
+  line-height: 1.6;
+}
+
+.dialog-foot {
+  display: flex;
+  gap: 20rpx;
+  padding: 0 36rpx 36rpx;
+}
+
+.dialog-btn {
+  flex: 1;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--shb-radius-md);
+  font-size: var(--shb-fs-base);
+  font-weight: var(--shb-fw-bold);
+  transition: all 0.15s ease;
+}
+
+.dialog-btn--cancel {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  color: #b0bac5;
+}
+
+.dialog-btn--confirm {
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  box-shadow: 0 4rpx 16rpx rgba(192, 232, 99, 0.25);
+}
+
+.dialog-btn--danger {
+  background: var(--shb-color-danger);
+  color: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(255, 92, 108, 0.3);
+}
+
+.dialog-btn--hover {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+
+.dialog-loading {
+  font-family: var(--shb-font-num);
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+}

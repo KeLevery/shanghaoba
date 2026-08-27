@@ -6,36 +6,36 @@
   <view class="pagehead">我的</view>
 
   <!-- 用户卡 -->
-  <view class="ucard">
+  <view class="ucard esports-card">
     <view class="ucard__ava">
-      <text wx:if="{{avatarChar}}">{{avatarChar}}</text>
-      <text wx:else class="ucard__ava-empty">?</text>
+      <image class="ucard__ava-img" src="/images/avatars/avatar-default.png" mode="aspectFill" />
+      <view class="ucard__ava-dot"></view>
     </view>
     <view class="ucard__main">
-      <view class="ucard__name">{{avatarChar ? gameNickname : '上号吧玩家'}}</view>
+      <view class="ucard__name">{{avatarChar ? gameNickname : '上号吧老王'}}</view>
       <view class="ucard__sub">游戏昵称 · 房间内向队友展示</view>
     </view>
     <view
-      class="ucard__edit {{editing ? 'ucard__edit--active' : ''}}"
+      class="ucard__edit press-scale {{editing ? 'ucard__edit--active' : ''}}"
       hover-class="ucard__edit--hover"
       bindtap="toggleEdit"
-    >{{editing ? '收起' : '修改'}}</view>
+    >{{editing ? '收起' : '修改昵称'}}</view>
   </view>
 
   <!-- 昵称编辑面板（展开式） -->
-  <view wx:if="{{editing}}" class="editpanel">
+  <view wx:if="{{editing}}" class="editpanel esports-card">
     <input
-      class="sunk-input"
+      class="sunk-input editpanel__input"
       value="{{gameNickname}}"
       maxlength="20"
-      placeholder="例如：Kele#1234"
+      placeholder="输入你的游戏昵称，例如：Kele#1234"
       placeholder-class="sunk-placeholder"
       bindinput="onNicknameInput"
     />
     <view class="editpanel__row">
       <view class="editpanel__count num {{charCount >= 20 ? 'editpanel__count--full' : ''}}">{{charCount}} / 20</view>
       <button
-        class="btn btn--primary editpanel__save"
+        class="btn btn--primary editpanel__save press-scale"
         hover-class="btn--primary-hover"
         loading="{{saving}}"
         disabled="{{saving}}"
@@ -44,30 +44,48 @@
     </view>
   </view>
 
-  <!-- 设置分组 -->
-  <view class="setgroup">
+  <!-- 设置分组（带微图标与圆角卡片） -->
+  <view class="setgroup esports-card">
     <view class="setrow" hover-class="setrow--hover" data-tab="about" bindtap="goAbout">
-      <text class="setrow__label">关于上号吧</text>
+      <view class="setrow__left">
+        <text class="setrow__icon">ℹ️</text>
+        <text class="setrow__label">关于上号吧</text>
+      </view>
       <text class="setrow__arrow">›</text>
     </view>
     <view class="setrow" hover-class="setrow--hover" data-tab="privacy" bindtap="goAbout">
-      <text class="setrow__label">隐私政策</text>
+      <view class="setrow__left">
+        <text class="setrow__icon">🛡️</text>
+        <text class="setrow__label">隐私政策</text>
+      </view>
       <text class="setrow__arrow">›</text>
     </view>
     <view class="setrow" hover-class="setrow--hover" data-tab="terms" bindtap="goAbout">
-      <text class="setrow__label">使用条款</text>
+      <view class="setrow__left">
+        <text class="setrow__icon">📃</text>
+        <text class="setrow__label">使用条款</text>
+      </view>
       <text class="setrow__arrow">›</text>
     </view>
     <view class="setrow" hover-class="setrow--hover" bindtap="onFeedback">
-      <text class="setrow__label">意见反馈</text>
+      <view class="setrow__left">
+        <text class="setrow__icon">✏️</text>
+        <text class="setrow__label">意见反馈</text>
+      </view>
       <text class="setrow__arrow">›</text>
     </view>
     <view class="setrow" hover-class="setrow--hover" bindtap="onClearCache">
-      <text class="setrow__label">清除缓存</text>
+      <view class="setrow__left">
+        <text class="setrow__icon">🧹</text>
+        <text class="setrow__label">清除缓存</text>
+      </view>
       <text class="setrow__val num">{{cacheSize}}</text>
     </view>
     <view class="setrow">
-      <text class="setrow__label">版本</text>
+      <view class="setrow__left">
+        <text class="setrow__icon">🏷️</text>
+        <text class="setrow__label">版本号</text>
+      </view>
       <text class="setrow__val num">{{version}}</text>
     </view>
   </view>

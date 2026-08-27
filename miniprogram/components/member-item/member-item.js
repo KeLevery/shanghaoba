@@ -7,6 +7,21 @@
 // 昵称为空时的兜底展示名
 var DEFAULT_NAME = '神秘玩家';
 
+var AVATARS = [
+  '/images/avatars/avatar1.png',
+  '/images/avatars/avatar2.png',
+  '/images/avatars/avatar3.png'
+];
+
+function getAvatarByOpenid(id) {
+  if (!id) return '';
+  var sum = 0;
+  for (var i = 0; i < id.length; i++) {
+    sum += id.charCodeAt(i);
+  }
+  return AVATARS[sum % AVATARS.length];
+}
+
 Component({
   options: {
     styleIsolation: 'isolated',
@@ -32,20 +47,27 @@ Component({
 
   data: {
     // 头像首字（昵称首字符，空则取兜底名首字）
-    avatarText: ''
+    avatarText: '',
+    avatarUrl: ''
   },
 
   observers: {
-    displayName: function (displayName) {
+    'displayName, openid': function (displayName, openid) {
       var name = displayName || DEFAULT_NAME;
-      this.setData({ avatarText: name.charAt(0) });
+      this.setData({
+        avatarText: name.charAt(0),
+        avatarUrl: getAvatarByOpenid(openid)
+      });
     }
   },
 
   lifetimes: {
     attached: function () {
       var name = this.data.displayName || DEFAULT_NAME;
-      this.setData({ avatarText: name.charAt(0) });
+      this.setData({
+        avatarText: name.charAt(0),
+        avatarUrl: getAvatarByOpenid(this.data.openid)
+      });
     }
   },
 
@@ -55,3 +77,4 @@ Component({
     }
   }
 });
+

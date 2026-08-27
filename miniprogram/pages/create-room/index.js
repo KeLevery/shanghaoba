@@ -86,9 +86,13 @@ Page({
     });
   },
 
-  // 点「其他游戏」格子：拉起键盘聚焦自定义输入框
+  // 点「其他游戏」格子：置为选中态（gameIndex=-1，与预设高亮同语义）+ 聚焦自定义输入框
   onCustomTileTap: function () {
-    this.setData({ focusCustomGame: true });
+    this.setData({
+      gameIndex: -1,
+      selectedGameName: (this.data.customGame || '').trim(),
+      focusCustomGame: true
+    });
   },
 
   // 输入框失焦后复位聚焦态，便于下次点击格子重新聚焦

@@ -88,43 +88,103 @@
   box-sizing: content-box;
 }
 
-/* ---- 胶囊筛选横滑 ---- */
-.chips-row {
-  white-space: nowrap;
-  padding: 32rpx 36rpx 28rpx;
-  box-sizing: border-box;
+/* ---- 筛选分段器 ---- */
+.tabs-bar {
+  margin-top: 16rpx;
+  background: var(--shb-bg-page);
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
 }
 
-.chips-row .pill {
-  display: inline-flex;
-  margin-right: 20rpx;
-}
-
-/* ---- 邀请码直达 ---- */
-.invite {
+/* ---- 战术邀请码直达卡片（电竞 HUD 质感） ---- */
+.invite-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  padding: 0 36rpx;
+  gap: 16rpx;
+  margin: 28rpx 36rpx 16rpx;
+  padding: 12rpx 12rpx 12rpx 20rpx;
+  background: var(--shb-bg-card);
+  border: 1rpx solid var(--shb-hairline);
+  border-radius: var(--shb-radius-full);
+  box-shadow: var(--shb-shadow-card);
+  overflow: hidden;
 }
 
-/* 覆盖 sunk-input 的 100% 宽，与「进房」按钮同行 */
-.invite__input {
+/* 顶部一道极细的主色高光，模拟 HUD 扫描线质感 */
+.invite-card::before {
+  content: '';
+  position: absolute;
+  left: 40rpx;
+  right: 40rpx;
+  top: 0;
+  height: 1rpx;
+  background: linear-gradient(90deg, transparent, var(--shb-color-primary-soft), transparent);
+}
+
+/* 主色软底圆形徽章托住闪电图标，呼应页眉铃铛的处理 */
+.invite-card__badge {
+  width: 56rpx;
+  height: 56rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--shb-color-primary-soft);
+  border: 1rpx solid var(--shb-hairline);
+}
+
+.invite-card__icon {
+  font-size: 26rpx;
+  color: var(--shb-color-primary);
+}
+
+.invite-card__input {
   flex: 1;
-  width: auto;
   min-width: 0;
-  height: 80rpx;
-  border-radius: var(--shb-radius-md);
+  height: 68rpx;
+  /* 微信原生 input 未显式设 background 时会默认白底，配合白色文字 → 白底白字看不见
+     （value 仍正确，故能进房）。显式透明底，露出卡片深色背景，白字可见。 */
+  background: transparent;
+  font-size: var(--shb-fs-md);
+  font-weight: var(--shb-fw-medium);
+  letter-spacing: 2rpx;
+  color: var(--shb-text-primary);
 }
 
-.invite__btn {
+.invite-card__placeholder {
+  color: var(--shb-text-tertiary);
+  font-size: var(--shb-fs-md);
+  font-weight: var(--shb-fw-regular);
+  letter-spacing: 0;
+}
+
+.invite-card__btn {
+  height: 68rpx;
   display: flex;
   align-items: center;
-  height: 80rpx;
-  padding: 0 40rpx;
-  border-radius: var(--shb-radius-md);
-  font-size: var(--shb-fs-base);
+  justify-content: center;
+  gap: 8rpx;
+  padding: 0 32rpx;
+  border-radius: var(--shb-radius-full);
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  font-size: var(--shb-fs-md);
+  font-weight: var(--shb-fw-bold);
   letter-spacing: 2rpx;
+  box-shadow: var(--shb-shadow-glow);
+  flex-shrink: 0;
+}
+
+.invite-card__arrow {
+  font-size: var(--shb-fs-md);
+  font-weight: var(--shb-fw-bold);
+  margin-left: 2rpx;
+}
+
+.invite-card__btn--hover {
+  background: var(--shb-color-primary-pressed);
+  transform: scale(0.96);
 }
 
 /* ---- 分区头 ---- */
@@ -132,19 +192,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 36rpx 36rpx 24rpx;
+  padding: 36rpx 36rpx 20rpx;
 }
 
 .sec__count {
   font-size: var(--shb-fs-xs);
   color: var(--shb-text-tertiary);
   font-weight: var(--shb-fw-medium);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4rpx 14rpx;
+  border-radius: var(--shb-radius-full);
 }
 
 /* ---- 房间卡片列表 ---- */
 .rooms {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
   padding: 0 36rpx;
 }
+

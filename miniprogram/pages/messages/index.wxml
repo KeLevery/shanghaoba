@@ -13,7 +13,7 @@
     <view
       wx:for="{{items}}"
       wx:key="roomId"
-      class="mrow"
+      class="mrow esports-card press-scale"
       hover-class="mrow--hover"
       data-room-id="{{item.roomId}}"
       bindtap="onItemTap"

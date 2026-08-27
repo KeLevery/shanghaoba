@@ -27,6 +27,31 @@ describe('create-room 页面（发起上号）', () => {
     expect(page.data.maxPlayers).toBe(4);
   });
 
+  test('点「其他游戏」格子：置为选中态（gameIndex=-1）并聚焦自定义输入框', () => {
+    const page = createPage();
+    page.onCustomTileTap();
+    expect(page.data.gameIndex).toBe(-1);
+    expect(page.data.focusCustomGame).toBe(true);
+    // 摘要栏回到占位（未填名时不残留上一个预设名）
+    expect(page.data.selectedGameName).toBe('');
+  });
+
+  test('点「其他游戏」后未填名即提交：被 validate 拦截并提示', () => {
+    const page = createPage();
+    page.onCustomTileTap();
+    expect(page.validate()).toBeNull();
+    expect(wxState.toasts).toContainEqual({ title: '请选择或输入游戏', icon: 'none' });
+  });
+
+  test('点「其他游戏」后再点预设游戏：取消自定义选中态', () => {
+    const page = createPage();
+    page.onCustomTileTap();
+    expect(page.data.gameIndex).toBe(-1);
+    page.onGameTap({ currentTarget: { dataset: { index: 2 } } });
+    expect(page.data.gameIndex).toBe(2);
+    expect(page.data.customGame).toBe('');
+  });
+
   test('人数步进边界：2 不再减、20 不再加', () => {
     const page = createPage();
     page.setData({ maxPlayers: 2 });

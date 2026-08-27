@@ -7,6 +7,7 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "room-card": "../../components/room-card/room-card",
-    "empty-state": "../../components/empty-state/empty-state"
+    "empty-state": "../../components/empty-state/empty-state",
+    "segmented-tabs": "../../components/segmented-tabs/segmented-tabs"
   }
 }

@@ -38,20 +38,37 @@
 /* 他人气泡：浮层底圆角；本人气泡：青柠绿底深字 */
 .chat-bubble__content {
   max-width: 76%;
-  padding: 18rpx 26rpx;
+  padding: 18rpx 28rpx;
   font-size: var(--shb-fs-base);
   line-height: 1.5;
   color: var(--shb-text-primary);
   background: var(--shb-bg-elev);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
   border-radius: 28rpx;
   border-bottom-left-radius: 8rpx;
   word-break: break-all;
+  box-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.25);
+  animation: bubbleFadeIn 0.2s ease-out;
 }
 
 .chat-bubble--self .chat-bubble__content {
   background: var(--shb-color-primary);
   color: var(--shb-text-inverse);
   font-weight: var(--shb-fw-medium);
+  border-color: transparent;
   border-bottom-left-radius: 28rpx;
   border-bottom-right-radius: 8rpx;
+  box-shadow: 0 4rpx 16rpx rgba(192, 232, 99, 0.2);
 }
+
+@keyframes bubbleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

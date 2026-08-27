@@ -7,32 +7,52 @@
 ============================================================ -->
 <!-- 空位占位行 -->
 <view wx:if="{{isEmpty}}" class="member member--empty">
-  <view class="member__ava">＋</view>
-  <text class="member__empty-text">空位 <text class="num">{{slotIndex}}</text> · 等待加入</text>
+  <view class="member__slot-num num">{{slotIndex}}</view>
+  <text class="member__empty-text">等待加入</text>
 </view>
 
 <!-- 成员行 -->
 <view wx:else class="member">
-  <!-- 圆形头像：已准备时青柠绿底深字 -->
+  <!-- 头像：特战风插画 / 优雅首字 -->
   <view class="member__ava {{ready ? 'member__ava--on' : ''}}">
-    <text>{{avatarText}}</text>
+    <image
+      wx:if="{{avatarUrl}}"
+      class="member__ava-img"
+      src="{{avatarUrl}}"
+      mode="aspectFill"
+    />
+    <text wx:else>{{avatarText}}</text>
+    <!-- 准备状态小角标 -->
+    <view wx:if="{{ready}}" class="member__ava-dot"></view>
   </view>
 
-  <view class="member__name">
-    <text class="member__name-text">{{displayName || '神秘玩家'}}</text>
-    <text wx:if="{{isHost}}" class="member__role">房主</text>
+  <view class="member__info">
+    <view class="member__name-row">
+      <text class="member__name-text">{{displayName || '神秘玩家'}}</text>
+      <text wx:if="{{isHost}}" class="member__crown">👑</text>
+    </view>
+    <text wx:if="{{isHost}}" class="member__host-desc">房主人</text>
   </view>
 
   <!-- 右侧准备状态 -->
-  <view class="member__state {{ready ? 'member__state--on' : ''}}">
-    {{ready ? '已准备' : '未准备'}}
+  <view class="member__status">
+    <view wx:if="{{ready}}" class="member__badge member__badge--ready">
+      <text>已准备</text>
+      <text class="member__badge-icon">✓</text>
+    </view>
+    <view wx:else class="member__badge member__badge--wait">
+      <text>未准备</text>
+      <text class="member__badge-icon">✕</text>
+    </view>
   </view>
 
-  <!-- 移除（房主视角且非房主本人） -->
+  <!-- 房主移除队员入口 -->
   <view
     wx:if="{{canRemove && !isHost}}"
     class="member__kick"
     hover-class="member__kick--hover"
     catchtap="onRemove"
+    title="移出房间"
   >×</view>
 </view>
+

@@ -38,10 +38,12 @@
 .mrow {
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: 22rpx;
   background: var(--shb-bg-card);
-  border-radius: var(--shb-radius-lg);
-  padding: 28rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--shb-radius-xl);
+  padding: 24rpx;
+  box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.35);
 }
 
 .mrow--hover {
@@ -49,11 +51,12 @@
 }
 
 .mrow__cover {
-  width: 96rpx;
-  height: 96rpx;
+  width: 108rpx;
+  height: 108rpx;
   border-radius: var(--shb-radius-md);
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.3);
 }
 
 .mrow__main {

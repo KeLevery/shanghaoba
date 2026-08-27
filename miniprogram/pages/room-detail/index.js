@@ -38,7 +38,10 @@ Page({
     // 房主昵称（信息卡展示）
     hostName: '',
     // 空位序号列表（等待加入占位行）
-    emptySlots: []
+    emptySlots: [],
+    // 核心作战室 Tab 分段：0=成员, 1=聊天, 2=设置
+    activeTab: 0,
+    tabs: ['成员', '聊天', '设置']
   },
 
   async onLoad(options) {
@@ -46,14 +49,14 @@ Page({
       wx.showToast({ title: '缺少房间信息', icon: 'none' });
       return;
     }
-    // ?tab=chat 兼容参数：聊天区常驻显示，无需再定位
+    var initialTab = options.tab === 'chat' ? 1 : 0;
     // 实例字段（不进 data，避免无谓 setData）：
     this._myOpenid = ''; // 本人 openid（用于聊天左右气泡）
     this._knownMsgIds = {}; // 消息 _id 去重表（防 watcher 乱序/重复事件）
     this._nameMap = {}; // openid → displayName（watcher 快照只有原始字段）
     this._lastSentMessageId = ''; // 最近一次 sendMessage 返回的 messageId
     this._hydrateTimer = null; // 昵称补水防抖定时器
-    this.setData({ roomId: options.roomId });
+    this.setData({ roomId: options.roomId, activeTab: initialTab });
     await this.enterRoom();
     if (this.data.room) {
       this.watchRoomData();
@@ -68,6 +71,7 @@ Page({
       if (!result.isMember) {
         await call('joinRoom', { roomId: this.data.roomId }, { loading: false, toastError: false });
         result = await call('getRoom', { roomId: this.data.roomId }, { loading: false, toastError: false });
+        wx.showToast({ title: '已成功加入房间', icon: 'success' });
       }
       this.applyRoomResult(result);
     } catch (error) {
@@ -515,5 +519,14 @@ Page({
 
   onShareTimeline() {
     return this.onShareAppMessage();
+  },
+
+  onTabChange(e) {
+    var raw = (e && e.detail && typeof e.detail.index === 'number')
+      ? e.detail.index
+      : (e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.index);
+    var index = Number(raw) || 0;
+    this.setData({ activeTab: index });
   }
 });
+

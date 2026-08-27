@@ -13,24 +13,25 @@
     </view>
   </view>
 
-  <!-- 游戏筛选胶囊 -->
-  <scroll-view class="chips-row" scroll-x enhanced show-scrollbar="{{false}}">
-    <view
-      wx:for="{{gameTabs}}"
-      wx:key="*this"
-      class="pill {{activeGameIndex === index ? 'pill--active' : ''}}"
-      data-index="{{index}}"
-      hover-class="pill--hover"
-      bindtap="onGameTabTap"
-    >{{item}}</view>
-  </scroll-view>
+  <!-- 游戏分类筛选分段器（白粗体高亮 + 青柠绿下划线滑动小条，对齐设计图） -->
+  <view class="tabs-bar">
+    <segmented-tabs
+      tabs="{{gameTabs}}"
+      current="{{activeGameIndex}}"
+      scrollable="{{true}}"
+      bind:change="onGameTabTap"
+    />
+  </view>
 
-  <!-- 邀请码直达：口述转告的 4 位码，输入即进房 -->
-  <view class="invite">
+  <!-- 邀请码战术直达：口述转告的 4 位码，融入暗色电竞 HUD 风格 -->
+  <view class="invite-card">
+    <view class="invite-card__badge">
+      <text class="invite-card__icon">⚡</text>
+    </view>
     <input
-      class="sunk-input invite__input"
-      placeholder="有码吗？输入邀请码直达房间"
-      placeholder-class="sunk-placeholder"
+      class="invite-card__input"
+      placeholder="输入邀请码 直达房间"
+      placeholder-class="invite-card__placeholder"
       maxlength="8"
       confirm-type="go"
       value="{{inviteCode}}"
@@ -38,10 +39,10 @@
       bindconfirm="onJoinByCode"
     />
     <view
-      class="btn btn--primary invite__btn"
-      hover-class="btn--primary-hover"
+      class="invite-card__btn press-scale"
+      hover-class="invite-card__btn--hover"
       bindtap="onJoinByCode"
-    >进房</view>
+    >进房<text class="invite-card__arrow">→</text></view>
   </view>
 
   <!-- 我的房间（仅在有数据时出现） -->
@@ -71,8 +72,8 @@
 
   <!-- 正在召集 -->
   <view class="sec">
-    <view class="sec-title">正在召集</view>
-    <text wx:if="{{filteredRooms.length}}" class="sec__count num">{{filteredRooms.length}} 个房间</text>
+    <view class="sec-title">正在召集 · {{gameTabs[activeGameIndex] || '全部'}}</view>
+    <text class="sec__count num">{{filteredRooms.length}} 个房间</text>
   </view>
 
   <view wx:if="{{filteredRooms.length}}" class="rooms">
@@ -92,9 +93,9 @@
   </view>
   <empty-state
     wx:else
-    title="现在没有人在召集"
-    description="发起一个房间，把链接甩进群里"
-    buttonText="发起上号"
+    title="{{activeGameIndex > 0 ? '暂无【' + gameTabs[activeGameIndex] + '】招募房间' : '现在没有人在召集'}}"
+    description="{{activeGameIndex > 0 ? '还没有这个游戏的房间，快去发起第一车！' : '发起一个房间，把链接甩进群里'}}"
+    buttonText="{{activeGameIndex > 0 ? '发起【' + gameTabs[activeGameIndex] + '】' : '发起上号'}}"
     bind:action="goCreate"
   />
 

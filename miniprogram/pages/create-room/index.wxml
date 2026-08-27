@@ -7,8 +7,26 @@
 
   <view class="pagehead">发起上号</view>
 
+  <!-- 步骤向导指示条（对齐设计原型图） -->
+  <view class="steps-bar">
+    <view class="step-item step-item--active">
+      <view class="step-item__dot">✓</view>
+      <text class="step-item__label">选游戏</text>
+    </view>
+    <view class="step-line step-line--active"></view>
+    <view class="step-item step-item--active">
+      <view class="step-item__dot">2</view>
+      <text class="step-item__label">设置</text>
+    </view>
+    <view class="step-line"></view>
+    <view class="step-item">
+      <view class="step-item__dot">3</view>
+      <text class="step-item__label">备注</text>
+    </view>
+  </view>
+
   <!-- 游戏选择：2 列封面网格 -->
-  <view class="formcard">
+  <view class="formcard esports-card">
     <view class="formcard__head">
       <text class="formcard__title">选择游戏</text>
       <text class="formcard__hint">切换时带入默认人数</text>
@@ -33,7 +51,7 @@
       </view>
       <!-- 自定义游戏入口：网格内显眼的「＋ 其他游戏」格子 -->
       <view
-        class="gitem gitem--custom {{customGame ? 'gitem--active' : ''}}"
+        class="gitem gitem--custom {{gameIndex === -1 ? 'gitem--active' : ''}}"
         hover-class="gitem--hover"
         bindtap="onCustomTileTap"
       >
@@ -44,7 +62,7 @@
           <text class="gitem__name">其他游戏</text>
           <text class="gitem__def">自填</text>
         </view>
-        <view wx:if="{{customGame}}" class="gitem__check">✓</view>
+        <view wx:if="{{gameIndex === -1}}" class="gitem__check">✓</view>
       </view>
     </view>
     <!-- 自定义游戏名输入（点「其他游戏」格子后聚焦） -->
@@ -63,13 +81,13 @@
   </view>
 
   <!-- 队伍人数：滑块调整（±微调 + 点刻度带直接设值） -->
-  <view class="formcard">
+  <view class="formcard esports-card">
     <view class="formcard__head">
       <text class="formcard__title">队伍人数</text>
       <text class="formcard__hint">2 – 20 人</text>
     </view>
     <view class="stepper">
-      <view class="stepper__btn" hover-class="stepper__btn--hover" bindtap="decrease">−</view>
+      <view class="stepper__btn press-scale" hover-class="stepper__btn--hover" bindtap="decrease">−</view>
       <view
         class="pslider"
         catchtouchstart="onSliderTouchStart"
@@ -92,7 +110,7 @@
           ></view>
         </view>
       </view>
-      <view class="stepper__btn" hover-class="stepper__btn--hover" bindtap="increase">＋</view>
+      <view class="stepper__btn press-scale" hover-class="stepper__btn--hover" bindtap="increase">＋</view>
     </view>
     <view class="pslider__scale">
       <text class="num">2 人</text>
@@ -101,7 +119,7 @@
   </view>
 
   <!-- 模式 / 地图 -->
-  <view class="formcard">
+  <view class="formcard esports-card">
     <view class="formcard__head">
       <text class="formcard__title">模式 / 地图</text>
       <text class="formcard__hint">30 字以内</text>
@@ -129,7 +147,7 @@
   </view>
 
   <!-- 开打时间 -->
-  <view class="formcard">
+  <view class="formcard esports-card">
     <view class="formcard__head">
       <text class="formcard__title">开打时间</text>
     </view>
@@ -157,7 +175,7 @@
   </view>
 
   <!-- 备注 -->
-  <view class="formcard">
+  <view class="formcard esports-card">
     <view class="formcard__head">
       <text class="formcard__title">备注</text>
       <text class="formcard__hint">选填</text>
@@ -176,7 +194,7 @@
   <!-- 发起按钮（随内容流动，参考图样式） -->
   <view class="submitbar">
     <button
-      class="btn btn--primary submitbar__btn"
+      class="btn btn--primary submitbar__btn press-scale"
       hover-class="btn--primary-hover"
       disabled="{{submitting}}"
       bindtap="submit"

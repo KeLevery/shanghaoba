@@ -9,34 +9,45 @@
     tap  detail: { roomId }
 ============================================================ -->
 <view
-  class="room-card {{isFull ? 'room-card--full' : ''}}"
+  class="room-card esports-card press-scale {{isFull ? 'room-card--full' : ''}}"
   hover-class="room-card--hover"
   bindtap="onTap"
 >
-  <!-- 封面（缺图时 game-cover 降级为游戏色块 + 首字） -->
+  <!-- 封面海报 -->
   <view class="room-card__cover">
     <game-cover game="{{game}}" />
   </view>
 
+  <!-- 中间主体信息 -->
   <view class="room-card__main">
     <view class="room-card__title-row">
       <text class="room-card__title">{{game}}</text>
       <text wx:if="{{mode}}" class="room-card__mode">· {{mode}}</text>
-      <text wx:if="{{roleText === '房主'}}" class="room-card__role">房主</text>
+      <text wx:if="{{roleText === '房主'}}" class="room-card__role">👑 房主</text>
     </view>
+
     <view class="room-card__meta">
-      <text class="room-card__time">{{startTimeLabel}}</text>
-      <text wx:if="{{remark}}" class="room-card__remark"> · {{remark}}</text>
+      <text class="room-card__time">开打时间：{{startTimeLabel}}</text>
+    </view>
+
+    <view class="room-card__sub-row">
+      <view class="room-card__players">
+        <text class="room-card__player-icon">👥</text>
+        <text class="room-card__count num">{{memberCount}}<text class="room-card__count-max">/{{maxPlayers}}</text></text>
+      </view>
+      <text wx:if="{{remark}}" class="room-card__remark text-ellipsis">{{remark}}</text>
     </view>
   </view>
 
+  <!-- 右侧状态/行动胶囊 -->
   <view class="room-card__side">
-    <view class="room-card__count num">{{memberCount}}<text class="room-card__count-max">/{{maxPlayers}}</text></view>
-    <!-- 本人已在房中：回房入口；未解散都可直接回去 -->
-    <view wx:if="{{isMine && status !== 'dissolved'}}" class="room-card__join">回到房间</view>
-    <!-- 未满员：青柠绿「加入」胶囊；满员：灰胶囊；其他状态：状态点标签 -->
-    <view wx:elif="{{status === 'recruiting' || status === 'pending'}}" class="room-card__join">加入</view>
+    <text class="room-card__dots">···</text>
+    <!-- 本人已在房中：回房入口 -->
+    <view wx:if="{{isMine && status !== 'dissolved'}}" class="room-card__join room-card__join--mine">回到房间</view>
+    <!-- 未满员：青柠绿「加入」胶囊；满员：灰胶囊；其他状态：状态标签 -->
+    <view wx:elif="{{status === 'recruiting' || status === 'pending'}}" class="room-card__join">{{status === 'pending' ? '等待中' : '加入'}}</view>
     <view wx:elif="{{isFull}}" class="room-card__join room-card__join--full">已满员</view>
-    <view wx:else class="tagdot {{status === 'pending' ? 'tagdot--pending' : (status === 'dissolved' ? 'tagdot--gray' : '')}}">{{statusText}}</view>
+    <view wx:else class="tagdot {{status === 'dissolved' ? 'tagdot--gray' : ''}}">{{statusText}}</view>
   </view>
 </view>
+

@@ -1,0 +1,46 @@
+<!-- ============================================================
+  custom-dialog 电竞深色风格确认模态框
+  替代系统刺眼原生白色弹窗，提供沉浸感与明确的操作反馈
+  properties:
+    visible: boolean
+    title: string
+    content: string
+    confirmText: string (默认 '确认')
+    cancelText: string (默认 '取消')
+    type: 'default' | 'danger'
+    loading: boolean
+  events:
+    confirm, cancel
+============================================================ -->
+<view wx:if="{{visible}}" class="dialog-mask {{animating ? 'dialog-mask--show' : ''}}" catchtouchmove="preventTouchMove">
+  <view class="dialog-card {{animating ? 'dialog-card--show' : ''}}">
+    <!-- 顶部状态小标签/发光条 -->
+    <view class="dialog-accent {{type === 'danger' ? 'dialog-accent--danger' : ''}}"></view>
+
+    <view class="dialog-head">
+      <text class="dialog-title">{{title}}</text>
+    </view>
+
+    <view class="dialog-body">
+      <text class="dialog-content">{{content}}</text>
+      <slot></slot>
+    </view>
+
+    <view class="dialog-foot">
+      <view
+        wx:if="{{showCancel}}"
+        class="dialog-btn dialog-btn--cancel"
+        hover-class="dialog-btn--hover"
+        bindtap="onCancel"
+      >{{cancelText}}</view>
+      <view
+        class="dialog-btn {{type === 'danger' ? 'dialog-btn--danger' : 'dialog-btn--confirm'}}"
+        hover-class="dialog-btn--hover"
+        bindtap="onConfirm"
+      >
+        <text wx:if="{{loading}}" class="dialog-loading">···</text>
+        <text wx:else>{{confirmText}}</text>
+      </view>
+    </view>
+  </view>
+</view>

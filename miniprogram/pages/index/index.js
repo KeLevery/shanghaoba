@@ -125,7 +125,10 @@ Page({
 
   // 切换游戏筛选 tab
   onGameTabTap: function (e) {
-    var index = Number(e.currentTarget.dataset.index);
+    var raw = (e && e.detail && typeof e.detail.index === 'number')
+      ? e.detail.index
+      : (e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.index);
+    var index = Number(raw) || 0;
     this.setData({ activeGameIndex: index });
     this.applyFilter();
   },

@@ -6,17 +6,20 @@
   display: inline-flex;
 }
 
-/* 状态标：软底胶囊（进行中 = 青柠绿实底） */
+/* 状态标：电竞软底微光胶囊（进行中 = 青柠绿实底） */
 .status-tag {
   display: inline-flex;
   align-items: center;
   gap: 10rpx;
-  padding: 6rpx 18rpx;
+  padding: 6rpx 20rpx;
   font-size: var(--shb-fs-xs);
-  line-height: 32rpx;
+  font-weight: var(--shb-fw-medium);
+  line-height: 34rpx;
   border-radius: var(--shb-radius-full);
   letter-spacing: 1rpx;
   white-space: nowrap;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .status-tag::before {
@@ -28,31 +31,50 @@
 
 .status-tag--recruiting {
   color: var(--shb-color-primary);
-  background: var(--shb-color-primary-soft);
+  background: rgba(192, 232, 99, 0.12);
+  border: 1rpx solid rgba(192, 232, 99, 0.35);
 }
-.status-tag--recruiting::before { background: var(--shb-color-primary); }
+.status-tag--recruiting::before {
+  background: var(--shb-color-primary);
+  box-shadow: 0 0 8rpx var(--shb-color-primary);
+}
 
 .status-tag--pending {
   color: var(--shb-color-pending);
-  background: var(--shb-color-pending-soft);
+  background: rgba(255, 178, 36, 0.12);
+  border: 1rpx solid rgba(255, 178, 36, 0.4);
 }
-.status-tag--pending::before { background: var(--shb-color-pending); }
+.status-tag--pending::before {
+  background: var(--shb-color-pending);
+  box-shadow: 0 0 8rpx var(--shb-color-pending);
+}
 
 .status-tag--ready {
   color: var(--shb-text-inverse);
   background: var(--shb-color-primary);
   font-weight: var(--shb-fw-bold);
+  box-shadow: var(--shb-shadow-glow);
+  border: 1rpx solid transparent;
 }
-.status-tag--ready::before { background: var(--shb-text-inverse); }
+.status-tag--ready::before {
+  background: var(--shb-text-inverse);
+}
 
 .status-tag--full {
   color: var(--shb-text-secondary);
   background: var(--shb-bg-chip);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
 }
-.status-tag--full::before { background: var(--shb-text-tertiary); }
+.status-tag--full::before {
+  background: var(--shb-text-tertiary);
+}
 
 .status-tag--dissolved {
   color: var(--shb-text-tertiary);
   background: var(--shb-bg-chip);
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
 }
-.status-tag--dissolved::before { background: var(--shb-text-tertiary); }
+.status-tag--dissolved::before {
+  background: var(--shb-text-tertiary);
+}
+

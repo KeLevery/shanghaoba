@@ -13,18 +13,79 @@
 }
 
 .pagehead {
-  padding: 16rpx 36rpx 8rpx;
+  padding: 16rpx 36rpx 4rpx;
   font-size: var(--shb-fs-xxl);
   font-weight: var(--shb-fw-bold);
   color: var(--shb-text-primary);
 }
 
+/* ---- 步骤向导指示条 ---- */
+.steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 48rpx 20rpx;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.step-item__dot {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  color: var(--shb-text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: var(--shb-fw-bold);
+}
+
+.step-item--active .step-item__dot {
+  background: var(--shb-color-primary);
+  border-color: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
+  box-shadow: 0 0 16rpx rgba(192, 232, 99, 0.4);
+}
+
+.step-item__label {
+  font-size: 20rpx;
+  color: var(--shb-text-tertiary);
+  font-weight: var(--shb-fw-medium);
+}
+
+.step-item--active .step-item__label {
+  color: var(--shb-color-primary);
+  font-weight: var(--shb-fw-bold);
+}
+
+.step-line {
+  flex: 1;
+  height: 2rpx;
+  background: rgba(255, 255, 255, 0.1);
+  margin: -24rpx 16rpx 0;
+}
+
+.step-line--active {
+  background: var(--shb-color-primary);
+  box-shadow: 0 0 8rpx var(--shb-color-primary);
+}
+
 /* ---- 表单卡 ---- */
 .formcard {
-  margin: 28rpx 36rpx 0;
+  margin: 24rpx 36rpx 0;
   background: var(--shb-bg-card);
-  border-radius: var(--shb-radius-lg);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--shb-radius-xl);
   padding: 32rpx;
+  box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.35);
 }
 
 .formcard__head {
@@ -59,14 +120,17 @@
   position: relative;
   border: 4rpx solid transparent;
   box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gitem--hover {
-  opacity: 0.85;
+  opacity: 0.88;
+  transform: translateY(-2rpx);
 }
 
 .gitem--active {
   border-color: var(--shb-color-primary);
+  box-shadow: 0 0 24rpx rgba(192, 232, 99, 0.35);
 }
 
 /* 「其他游戏」自填格子：虚线边框 + 居中大＋，与预设游戏格区分但同尺寸 */
@@ -272,6 +336,7 @@
   width: 100%;
   height: 100rpx;
   font-size: var(--shb-fs-lg);
+  box-shadow: 0 6rpx 24rpx rgba(192, 232, 99, 0.35);
 }
 
 .submitbar__sum {

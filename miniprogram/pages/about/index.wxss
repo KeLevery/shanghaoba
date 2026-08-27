@@ -37,7 +37,9 @@
 
 /* ---- 文章排版 ---- */
 .article {
-  padding: 32rpx 40rpx 60rpx;
+  margin: 24rpx 36rpx;
+  padding: 36rpx 40rpx 60rpx;
+  border-radius: var(--shb-radius-xl);
 }
 
 .article__brand {

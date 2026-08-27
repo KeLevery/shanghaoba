@@ -1,0 +1,43 @@
+<!-- ============================================================
+  segmented-tabs 电竞风格滑动指示器 Tab 栏
+  对齐原型图：白粗体选中文本 + 青柠绿下划线滑动小指示条
+  properties:
+    tabs: Array<string>
+    current: number
+    scrollable: boolean
+  events:
+    change detail: { index: number }
+============================================================ -->
+<scroll-view
+  wx:if="{{scrollable}}"
+  class="seg-scroll"
+  scroll-x
+  enhanced
+  show-scrollbar="{{false}}"
+>
+  <view class="seg-wrap">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="*this"
+      class="seg-item {{current === index ? 'seg-item--active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabTap"
+    >
+      <text class="seg-text">{{item}}</text>
+      <view wx:if="{{current === index}}" class="seg-line"></view>
+    </view>
+  </view>
+</scroll-view>
+
+<view wx:else class="seg-wrap seg-wrap--fixed">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="*this"
+    class="seg-item seg-item--fixed {{current === index ? 'seg-item--active' : ''}}"
+    data-index="{{index}}"
+    bindtap="onTabTap"
+  >
+    <text class="seg-text">{{item}}</text>
+    <view wx:if="{{current === index}}" class="seg-line"></view>
+  </view>
+</view>
