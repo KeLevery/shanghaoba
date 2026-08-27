@@ -166,6 +166,8 @@ Page({
       maxPlayers: doc.maxPlayers,
       startTimeLabel: formatStartTime(doc.startTimeLabel),
       remark: doc.remark || '',
+      // 邀请码：createRoom 落地时生成；历史存量房间无此字段则为空串（前端隐藏该行）
+      inviteCode: doc.inviteCode || '',
       status: doc.status,
       statusText: STATUS_TEXT[doc.status] || doc.status,
       isReadyState: doc.status === 'ready',
@@ -339,6 +341,18 @@ Page({
   },
 
   // ---- 聊天 ----
+  // 复制邀请码：没收到分享卡片的朋友，靠口头转告的码也能进房
+  copyInvite() {
+    const code = (this.data.room && this.data.room.inviteCode) || '';
+    if (!code) {
+      return;
+    }
+    wx.setClipboardData({
+      data: code,
+      success: () => wx.showToast({ title: '邀请码已复制', icon: 'none' })
+    });
+  },
+
   onMessageInput(e) {
     this.setData({ messageContent: e.detail.value });
   },

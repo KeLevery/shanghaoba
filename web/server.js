@@ -257,7 +257,9 @@ const server = http.createServer(async (req, res) => {
       const rel = pathname.slice('/mp/'.length).replace(/\//g, path.sep);
       const full = path.join(MP_ROOT, rel);
       if (full.startsWith(MP_ROOT) && fs.existsSync(full) && fs.statSync(full).isFile()) {
-        sendFile(res, full, true);
+        // 源码类文件不缓存：调小程序页面时改完代码刷新即生效；仅媒体资源走强缓存
+        const ext = path.extname(full).toLowerCase();
+        sendFile(res, full, ext === '.svg' || ext === '.png');
       } else {
         res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
         res.end('404');

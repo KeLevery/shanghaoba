@@ -69,6 +69,36 @@
   border-color: var(--shb-color-primary);
 }
 
+/* 「其他游戏」自填格子：虚线边框 + 居中大＋，与预设游戏格区分但同尺寸 */
+.gitem--custom {
+  border: 4rpx dashed var(--shb-hairline-strong);
+  background: transparent;
+}
+
+.gitem__cover--plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gitem__plus {
+  font-size: 64rpx;
+  font-weight: var(--shb-fw-bold);
+  color: var(--shb-text-secondary);
+}
+
+.gitem--custom.gitem--active {
+  border: 4rpx solid var(--shb-color-primary);
+}
+
+.gitem--custom .gitem__name {
+  color: var(--shb-text-secondary);
+}
+
+.gitem--custom.gitem--active .gitem__name {
+  color: var(--shb-text-primary);
+}
+
 .gitem__cover {
   height: 184rpx;
 }
@@ -109,7 +139,7 @@
   justify-content: center;
 }
 
-/* ---- 人数步进器 ---- */
+/* ---- 人数滑块（轨道 + 青柠绿拖片 + 刻度停泊点层） ---- */
 .stepper {
   display: flex;
   align-items: center;
@@ -118,6 +148,7 @@
 .stepper__btn {
   width: 88rpx;
   height: 88rpx;
+  flex-shrink: 0;
   border-radius: var(--shb-radius-md);
   background: var(--shb-bg-elev);
   color: #d7dee6;
@@ -131,51 +162,72 @@
   opacity: 0.7;
 }
 
-.stepper__val {
+.pslider {
+  position: relative;
   flex: 1;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
+  height: 88rpx;
+  margin: 0 20rpx;
 }
 
-.stepper__num {
-  font-size: 44rpx;
-  color: var(--shb-text-primary);
-}
-
-.stepper__unit {
-  font-size: var(--shb-fs-sm);
-  color: var(--shb-text-tertiary);
-  margin-left: 8rpx;
-}
-
-/* 快捷人数档 */
-.qnums {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 24rpx;
-}
-
-.qnums__item {
-  width: 76rpx;
-  height: 60rpx;
+.pslider__rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 12rpx;
+  transform: translateY(-50%);
   border-radius: var(--shb-radius-full);
-  background: var(--shb-bg-elev);
-  color: var(--shb-text-secondary);
+  background: var(--shb-bg-track);
+  overflow: hidden;
+}
+
+.pslider__fill {
+  height: 100%;
+  border-radius: var(--shb-radius-full);
+  background: var(--shb-color-primary);
+}
+
+/* 拖片：内嵌当前人数；pointer-events:none 让点击穿透到刻度层 */
+.pslider__thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 4rpx solid #0d151d;
+  background: var(--shb-color-primary);
+  color: var(--shb-text-inverse);
   font-size: var(--shb-fs-sm);
+  font-weight: var(--shb-fw-bold);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(192, 232, 99, 0.3);
+  pointer-events: none;
 }
 
-.qnums__item--hover {
-  opacity: 0.7;
+/* 刻度停泊点层：透明等分区铺满轨道，点击即设值 */
+.pslider__stops {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
 }
 
-.qnums__item--active {
-  background: var(--shb-color-primary);
-  color: var(--shb-text-inverse);
-  font-weight: var(--shb-fw-bold);
+.pslider__stop {
+  flex: 1;
+}
+
+.pslider__scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12rpx;
+  font-size: var(--shb-fs-xs);
+  color: var(--shb-text-tertiary);
 }
 
 /* chips 区 */

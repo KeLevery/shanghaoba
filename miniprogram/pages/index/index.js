@@ -24,7 +24,8 @@ Page({
     activeGameIndex: 0, // 当前筛选 tab（0=全部）
     filteredRooms: [],  // 筛选后的「正在召集」
     filteredMyRooms: [], // 筛选后的「我的房间」
-    dateText: ''        // 页眉右侧日期
+    dateText: '',       // 页眉右侧日期
+    inviteCode: ''      // 邀请码输入框内容
   },
 
   onShow: function () {
@@ -39,6 +40,64 @@ Page({
   // 下拉刷新
   onPullDownRefresh: function () {
     this.loadAll(true);
+  },
+
+  onInviteInput: function (e) {
+    this.setData({ inviteCode: e.detail.value });
+  },
+
+  // 邀请码直达：客户端直查 rooms 集合（§4.2 所有用户可读）。
+  // 不用 db.command 条件操作符（本地调试运行时不支持），
+  // 改为拉取最近的同码房间后本地过滤掉已解散/已过期，取最新一个；
+  // 进入 room-detail 后由其「分享即入房」逻辑自动加入（满员/锁房由该页提示）。
+  onJoinByCode: function () {
+    var self = this;
+    var code = (this.data.inviteCode || '').trim().toUpperCase();
+    if (!code) {
+      wx.showToast({ title: '请输入邀请码', icon: 'none' });
+      return;
+    }
+    var db = wx.cloud.database();
+    wx.showLoading({ title: '进房中', mask: true });
+    var done = function () { wx.hideLoading(); };
+    db.collection('rooms')
+      .where({ inviteCode: code })
+      .orderBy('createdAt', 'desc')
+      .limit(10)
+      .get()
+      .then(function (res) {
+        done();
+        var now = Date.now();
+        var room = null;
+        var sawExpired = false;
+        (res.data || []).some(function (d) {
+          if (d.status === 'dissolved') {
+            return false;
+          }
+          // expireAt 兼容 Date / 时间戳 / ISO 字符串（本地运行时经 JSON 序列化后是字符串，
+          // 直接和数字比较会得 NaN 导致过滤失效）
+          var expireTs = d.expireAt ? new Date(d.expireAt).getTime() : 0;
+          if (expireTs && expireTs <= now) {
+            sawExpired = true;
+            return false;
+          }
+          room = d;
+          return true;
+        });
+        if (!room) {
+          wx.showToast({
+            title: sawExpired ? '房间已过期，请房主重新发起' : '邀请码不存在，再核对一下',
+            icon: 'none'
+          });
+          return;
+        }
+        self.setData({ inviteCode: '' });
+        wx.navigateTo({ url: '/pages/room-detail/index?roomId=' + room._id });
+      })
+      .catch(function () {
+        done();
+        wx.showToast({ title: '查询失败，再试一次', icon: 'none' });
+      });
   },
 
   // 并发拉取两区列表；fromPullDown 为 true 时结束后收起下拉动画
@@ -71,18 +130,22 @@ Page({
     this.applyFilter();
   },
 
-  // 按当前 tab 过滤两区列表（全部则直通）
+  // 按当前 tab 过滤两区列表（全部则直通）；
+  // 已加入的房间（出现在我的房间）不再重复出现在正在召集区，避免同房间两个入口文案打架。
   applyFilter: function () {
     var tab = GAME_TABS[this.data.activeGameIndex];
+    var myIds = {};
+    this.data.myRooms.forEach(function (r) { myIds[r._id] = true; });
+    var recruiting = this.data.rooms.filter(function (r) { return !myIds[r._id]; });
     if (!tab || tab === '全部') {
       this.setData({
-        filteredRooms: this.data.rooms,
+        filteredRooms: recruiting,
         filteredMyRooms: this.data.myRooms
       });
       return;
     }
     this.setData({
-      filteredRooms: this.data.rooms.filter(function (r) { return r.game === tab; }),
+      filteredRooms: recruiting.filter(function (r) { return r.game === tab; }),
       filteredMyRooms: this.data.myRooms.filter(function (r) { return r.game === tab; })
     });
   },

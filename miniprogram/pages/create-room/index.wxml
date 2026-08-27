@@ -31,10 +31,38 @@
         </view>
         <view wx:if="{{gameIndex === index}}" class="gitem__check">✓</view>
       </view>
+      <!-- 自定义游戏入口：网格内显眼的「＋ 其他游戏」格子 -->
+      <view
+        class="gitem gitem--custom {{customGame ? 'gitem--active' : ''}}"
+        hover-class="gitem--hover"
+        bindtap="onCustomTileTap"
+      >
+        <view class="gitem__cover gitem__cover--plus">
+          <text class="gitem__plus">＋</text>
+        </view>
+        <view class="gitem__row">
+          <text class="gitem__name">其他游戏</text>
+          <text class="gitem__def">自填</text>
+        </view>
+        <view wx:if="{{customGame}}" class="gitem__check">✓</view>
+      </view>
+    </view>
+    <!-- 自定义游戏名输入（点「其他游戏」格子后聚焦） -->
+    <view class="formcard__input">
+      <input
+        class="sunk-input"
+        placeholder="输入游戏名，如：我的世界 / 云顶之弈"
+        placeholder-class="sunk-placeholder"
+        maxlength="20"
+        focus="{{focusCustomGame}}"
+        value="{{customGame}}"
+        bindinput="onCustomGameInput"
+        bindblur="onCustomGameBlur"
+      />
     </view>
   </view>
 
-  <!-- 队伍人数 -->
+  <!-- 队伍人数：滑块调整（±微调 + 点刻度带直接设值） -->
   <view class="formcard">
     <view class="formcard__head">
       <text class="formcard__title">队伍人数</text>
@@ -42,21 +70,33 @@
     </view>
     <view class="stepper">
       <view class="stepper__btn" hover-class="stepper__btn--hover" bindtap="decrease">−</view>
-      <view class="stepper__val">
-        <text class="num stepper__num">{{maxPlayers}}</text>
-        <text class="stepper__unit">人</text>
+      <view
+        class="pslider"
+        catchtouchstart="onSliderTouchStart"
+        catchtouchmove="onSliderTouchMove"
+        catchtouchend="onSliderTouchEnd"
+      >
+        <view class="pslider__rail">
+          <view class="pslider__fill" style="width: {{sliderPct}}%;"></view>
+        </view>
+        <!-- 滑块拖片：内嵌当前人数 -->
+        <view class="pslider__thumb num" style="left: {{sliderPct}}%;">{{maxPlayers}}</view>
+        <!-- 刻度停泊点层：19 个透明等分区，点哪个就是几人 -->
+        <view class="pslider__stops">
+          <view
+            wx:for="{{sliderStops}}"
+            wx:key="*this"
+            class="pslider__stop"
+            data-value="{{item}}"
+            bindtap="onSliderTap"
+          ></view>
+        </view>
       </view>
       <view class="stepper__btn" hover-class="stepper__btn--hover" bindtap="increase">＋</view>
     </view>
-    <view class="qnums">
-      <view
-        wx:for="{{quickNums}}"
-        wx:key="*this"
-        class="qnums__item num {{maxPlayers === item ? 'qnums__item--active' : ''}}"
-        data-value="{{item}}"
-        hover-class="qnums__item--hover"
-        bindtap="onQuickNumTap"
-      >{{item}}</view>
+    <view class="pslider__scale">
+      <text class="num">2 人</text>
+      <text class="num">20 人</text>
     </view>
   </view>
 
@@ -141,7 +181,7 @@
       disabled="{{submitting}}"
       bindtap="submit"
     >{{submitting ? '发起中…' : '发起上号'}}</button>
-    <text class="submitbar__sum">{{games[gameIndex].name}}{{mode ? ' · ' + mode : ''}} · {{maxPlayers}} 人房 · {{timeLabel}}</text>
+    <text class="submitbar__sum">{{selectedGameName || '选个游戏'}}{{mode ? ' · ' + mode : ''}} · {{maxPlayers}} 人房 · {{timeLabel}}</text>
   </view>
 
   <!-- 底部留白（自定义 TabBar 让位） -->

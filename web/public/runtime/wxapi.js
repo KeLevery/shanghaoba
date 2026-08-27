@@ -207,6 +207,66 @@ WMP.wxapi = (function () {
     return { keys: keys, currentSize: Math.max(0.1, Math.round(bytes / 102.4) / 10) };
   }
 
+  // ---------- 剪贴板（房间详情复制邀请码依赖） ----------
+  function setClipboardData(opts) {
+    var text = String((opts && opts.data) || '');
+    var done = function () { if (opts && opts.success) opts.success({}); };
+    var fail = function () { if (opts && opts.fail) opts.fail(new Error('复制失败')); };
+    // 优先异步 Clipboard API；不可用（如非安全上下文）时降级 execCommand
+    var fallback = function () {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      } catch (e) {
+        fail();
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  // ---------- 节点查询（滑块拖拽测量轨道位置） ----------
+  // 最小子集：select().boundingClientRect(cb).exec()
+  function createSelectorQuery() {
+    var reqs = [];
+    var api = {
+      select: function (sel) {
+        return {
+          boundingClientRect: function (cb) {
+            reqs.push({ sel: sel, cb: cb });
+            return api;
+          }
+        };
+      },
+      exec: function (cb) {
+        var results = reqs.map(function (r) {
+          var el = document.querySelector(r.sel);
+          if (!el) return null;
+          var rc = el.getBoundingClientRect();
+          return {
+            left: rc.left, right: rc.right, top: rc.top, bottom: rc.bottom,
+            width: rc.width, height: rc.height
+          };
+        });
+        setTimeout(function () {
+          reqs.forEach(function (r, i) { if (r.cb) r.cb(results[i]); });
+          if (cb) cb(results);
+        }, 0);
+      }
+    };
+    return api;
+  }
+
   // ---------- 组装全局 wx ----------
   var wx = {
     // UI
@@ -218,6 +278,8 @@ WMP.wxapi = (function () {
     setNavigationBarTitle: function (opts) {
       if (WMP.nav && WMP.nav.setNavigationBarTitle) WMP.nav.setNavigationBarTitle(opts || {});
     },
+    setClipboardData: setClipboardData,
+    createSelectorQuery: createSelectorQuery,
 
     // 导航（core.js 注入实现）
     navigateTo: function (opts) { WMP.nav.navigateTo(opts.url, opts); },

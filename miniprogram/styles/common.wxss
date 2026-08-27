@@ -118,6 +118,18 @@
   padding: 16rpx 24rpx;
 }
 
+/* 软红实感按钮：危险操作（退出/解散）用，比文字链接醒目 */
+.btn--danger {
+  background: var(--shb-color-danger-soft);
+  border: 2rpx solid rgba(255, 92, 108, 0.4);
+  color: var(--shb-color-danger);
+  font-weight: var(--shb-fw-medium);
+}
+.btn--danger-hover {
+  opacity: 0.8;
+  background: rgba(255, 92, 108, 0.2);
+}
+
 /* ---- 状态点标签（圆点 + 文字） ---- */
 .tagdot {
   display: inline-flex;

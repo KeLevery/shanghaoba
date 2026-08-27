@@ -6,9 +6,20 @@ const db = cloud.database();
 // 公共常量与校验逻辑（副本由 cloudfunctions/_shared/sync.js 同步维护）
 const {
   STATUS, ROOM_EXPIRE_MS,
-  MODE_MAX_LENGTH, REMARK_MAX_LENGTH, START_TIME_MAX_LENGTH
+  MODE_MAX_LENGTH, REMARK_MAX_LENGTH, START_TIME_MAX_LENGTH,
+  GAME_MAX_LENGTH, INVITE_CODE_CHARS, INVITE_CODE_LENGTH
 } = require('./_shared/constants');
 const { assertValidGame, assertMaxPlayers, assertStartTimeLabel, trimAndSlice } = require('./_shared/validate');
+
+// 生成房间邀请码：去除易混淆字符的随机 4 位码。
+// 与现有活跃房撞码概率极低；首页按码查询取最新的未解散房，无需唯一索引。
+function genInviteCode() {
+  let code = '';
+  for (let i = 0; i < INVITE_CODE_LENGTH; i++) {
+    code += INVITE_CODE_CHARS[Math.floor(Math.random() * INVITE_CODE_CHARS.length)];
+  }
+  return code;
+}
 
 exports.main = async (event) => {
   const { game, mode, maxPlayers, remark, startTimeLabel } = event;
@@ -17,6 +28,9 @@ exports.main = async (event) => {
   assertValidGame(game);
   assertMaxPlayers(maxPlayers);
   assertStartTimeLabel(startTimeLabel);
+  // 游戏名：预设枚举直通，自定义名 trim 后截断到 GAME_MAX_LENGTH（枚举名远短于限制，不受影响）
+  const cleanGame = trimAndSlice(game, GAME_MAX_LENGTH);
+  assertValidGame(cleanGame);
   const cleanMode = trimAndSlice(mode, MODE_MAX_LENGTH);
   const cleanRemark = trimAndSlice(remark, REMARK_MAX_LENGTH);
   const cleanStartTimeLabel = trimAndSlice(startTimeLabel, START_TIME_MAX_LENGTH);
@@ -26,11 +40,12 @@ exports.main = async (event) => {
   try {
     const created = await db.collection('rooms').add({
       data: {
-        game,
+        game: cleanGame,
         mode: cleanMode,
         maxPlayers,
         remark: cleanRemark,
         startTimeLabel: cleanStartTimeLabel,
+        inviteCode: genInviteCode(),
         hostOpenid: openid,
         status: STATUS.RECRUITING,
         createdAt: now,

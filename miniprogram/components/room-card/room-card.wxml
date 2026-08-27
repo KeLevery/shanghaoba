@@ -4,6 +4,7 @@
   properties:
     roomId / game / mode / startTimeLabel / memberCount / maxPlayers
     status / remark / roleText（我的房间角色标，空不展示）
+    isMine（本人已在房中：右侧胶囊显示「回到房间」而非「加入」）
   events:
     tap  detail: { roomId }
 ============================================================ -->
@@ -31,8 +32,10 @@
 
   <view class="room-card__side">
     <view class="room-card__count num">{{memberCount}}<text class="room-card__count-max">/{{maxPlayers}}</text></view>
+    <!-- 本人已在房中：回房入口；未解散都可直接回去 -->
+    <view wx:if="{{isMine && status !== 'dissolved'}}" class="room-card__join">回到房间</view>
     <!-- 未满员：青柠绿「加入」胶囊；满员：灰胶囊；其他状态：状态点标签 -->
-    <view wx:if="{{status === 'recruiting' || status === 'pending'}}" class="room-card__join">加入</view>
+    <view wx:elif="{{status === 'recruiting' || status === 'pending'}}" class="room-card__join">加入</view>
     <view wx:elif="{{isFull}}" class="room-card__join room-card__join--full">已满员</view>
     <view wx:else class="tagdot {{status === 'pending' ? 'tagdot--pending' : (status === 'dissolved' ? 'tagdot--gray' : '')}}">{{statusText}}</view>
   </view>

@@ -31,6 +31,12 @@
         <text class="num">{{participants.length}} / {{room.maxPlayers}} 人</text>
         <text class="dossier__pready"><text class="num">{{readyCount}}</text> 人已准备</text>
       </view>
+      <!-- 邀请码：无码（历史存量房）时隐藏；点击整行复制 -->
+      <view wx:if="{{room.inviteCode}}" class="dossier__code" hover-class="dossier__code--hover" bindtap="copyInvite">
+        <text class="dossier__code-label">邀请码</text>
+        <text class="num dossier__code-val">{{room.inviteCode}}</text>
+        <text class="dossier__code-copy">复制</text>
+      </view>
     </view>
   </view>
 
@@ -97,10 +103,10 @@
     </view>
   </view>
 
-  <!-- 危险操作（弱化文字链接） -->
+  <!-- 危险操作（软红底实感按钮，不再弱化为文字链接） -->
   <view class="danger-zone">
-    <view wx:if="{{isHost}}" class="btn--danger-link" hover-class="danger-link--hover" bindtap="dissolveRoom">解散房间</view>
-    <view wx:else class="btn--danger-link" hover-class="danger-link--hover" bindtap="leaveRoom">退出房间</view>
+    <view wx:if="{{isHost}}" class="btn btn--danger danger-zone__btn" hover-class="btn--danger-hover" bindtap="dissolveRoom">解散房间</view>
+    <view wx:else class="btn btn--danger danger-zone__btn" hover-class="btn--danger-hover" bindtap="leaveRoom">退出房间</view>
   </view>
 
   <!-- 底部占位，避免内容被操作栏遮挡 -->

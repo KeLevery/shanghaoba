@@ -18,11 +18,23 @@ var TIME_OPTIONS = ['现在开打', '今晚', '明天', '自定义时间'];
 // 模式/地图预设（选「自定义」时露出自由输入，契约 mode 仍为 ≤30 自由文本）
 var MODE_PRESETS = ['排位', '匹配', '娱乐', '自定义'];
 
-// 人数快捷档（2-20 契约内的常用档位）
-var QUICK_NUMS = [2, 3, 4, 5, 6, 10];
-
+// 人数上下限（契约：2-20）
 var MIN_PLAYERS = 2;
 var MAX_PLAYERS = 20;
+
+// 滑块刻度（2-20 每个整数一个停泊点，点击即设值）
+var SLIDER_STOPS = (function () {
+  var stops = [];
+  for (var i = MIN_PLAYERS; i <= MAX_PLAYERS; i++) {
+    stops.push(i);
+  }
+  return stops;
+})();
+
+// 人数 → 滑块填充百分比
+function playersToPct(value) {
+  return Math.round(((value - MIN_PLAYERS) / (MAX_PLAYERS - MIN_PLAYERS)) * 100);
+}
 
 // 表单校验提示（仅此用途允许手写 toast）
 function validateToast(title) {
@@ -33,6 +45,10 @@ Page({
   data: {
     games: GAME_LIST,
     gameIndex: 0,
+    // 自定义游戏名（枚举外的自由输入，≤20 字，契约同 createRoom 校验）
+    customGame: '',
+    // 当前生效的游戏名（摘要栏/校验用）：选预设或填自定义名
+    selectedGameName: GAME_LIST[0].name,
     maxPlayers: GAME_LIST[0].defaultPlayers,
     mode: MODE_PRESETS[0],   // 默认预设「排位」；选「自定义」后清空待填
     remark: '',
@@ -43,7 +59,11 @@ Page({
     submitting: false,
     modePresets: MODE_PRESETS,
     modePresetIndex: 0,      // 当前模式预设下标；最后一项为「自定义」
-    quickNums: QUICK_NUMS
+    // 自定义游戏格子聚焦态（bindblur 后复位，再次点击可重新拉起键盘）
+    focusCustomGame: false,
+    // 人数滑块：刻度停泊点 + 填充百分比
+    sliderStops: SLIDER_STOPS,
+    sliderPct: playersToPct(GAME_LIST[0].defaultPlayers)
   },
 
   onShow: function () {
@@ -53,33 +73,107 @@ Page({
     }
   },
 
-  // 选择游戏：切换时带入该游戏默认人数
+  // 选择游戏：切换时带入该游戏默认人数；清掉自定义游戏输入
   onGameTap: function (e) {
     var index = Number(e.currentTarget.dataset.index);
     this.setData({
       gameIndex: index,
-      maxPlayers: GAME_LIST[index].defaultPlayers
+      customGame: '',
+      focusCustomGame: false,
+      selectedGameName: GAME_LIST[index].name,
+      maxPlayers: GAME_LIST[index].defaultPlayers,
+      sliderPct: playersToPct(GAME_LIST[index].defaultPlayers)
     });
   },
 
-  // 人数步进（2-20）
+  // 点「其他游戏」格子：拉起键盘聚焦自定义输入框
+  onCustomTileTap: function () {
+    this.setData({ focusCustomGame: true });
+  },
+
+  // 输入框失焦后复位聚焦态，便于下次点击格子重新聚焦
+  onCustomGameBlur: function () {
+    this.setData({ focusCustomGame: false });
+  },
+
+  // 输入自定义游戏名：非空时取消预设选中态（与 demo「或输入其他游戏」交互一致）
+  onCustomGameInput: function (e) {
+    var trimmed = (e.detail.value || '').trim();
+    this.setData({
+      customGame: e.detail.value,
+      gameIndex: trimmed ? -1 : this.data.gameIndex,
+      selectedGameName: trimmed || (this.data.gameIndex >= 0 ? GAME_LIST[this.data.gameIndex].name : '')
+    });
+  },
+
+  // 人数滑块：±微调 + 点刻度带直接设值（2-20）
+  updatePlayers: function (value) {
+    if (value < MIN_PLAYERS) value = MIN_PLAYERS;
+    if (value > MAX_PLAYERS) value = MAX_PLAYERS;
+    this.setData({ maxPlayers: value, sliderPct: playersToPct(value) });
+  },
+
   decrease: function () {
-    if (this.data.maxPlayers > MIN_PLAYERS) {
-      this.setData({ maxPlayers: this.data.maxPlayers - 1 });
-    }
+    this.updatePlayers(this.data.maxPlayers - 1);
   },
   increase: function () {
-    if (this.data.maxPlayers < MAX_PLAYERS) {
-      this.setData({ maxPlayers: this.data.maxPlayers + 1 });
+    this.updatePlayers(this.data.maxPlayers + 1);
+  },
+
+  // 点击滑块刻度带：落在哪个停泊点就设为对应人数
+  onSliderTap: function (e) {
+    var value = Number(e.currentTarget.dataset.value);
+    if (value >= MIN_PLAYERS && value <= MAX_PLAYERS) {
+      this.updatePlayers(value);
     }
   },
 
-  // 人数快捷档
-  onQuickNumTap: function (e) {
-    var value = Number(e.currentTarget.dataset.value);
-    if (value >= MIN_PLAYERS && value <= MAX_PLAYERS) {
-      this.setData({ maxPlayers: value });
+  // ---- 滑块拖拽（按住轨道左右拖动）----
+  // 触点横坐标 → 人数：用 boundingClientRect 测一次轨道位置缓存复用；
+  // 真实小程序与本地运行时均支持 wx.createSelectorQuery 最小集。
+  _touchClientX: function (e) {
+    var t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+    return t ? t.clientX : 0;
+  },
+
+  _applySliderX: function (clientX) {
+    var rect = this._sliderRect;
+    if (!rect || !rect.width) {
+      return;
     }
+    var ratio = (clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(1, ratio));
+    var value = Math.round(MIN_PLAYERS + ratio * (MAX_PLAYERS - MIN_PLAYERS));
+    if (value !== this.data.maxPlayers) {
+      this.updatePlayers(value);
+    }
+  },
+
+  onSliderTouchStart: function (e) {
+    var self = this;
+    this._sliderDragging = true;
+    if (this._sliderRect) {
+      this._applySliderX(this._touchClientX(e));
+      // 后台刷新一次缓存，窗口尺寸变化后不至于拖偏（本次拖拽仍用旧值）
+    }
+    wx.createSelectorQuery().select('.pslider__rail').boundingClientRect(function (rect) {
+      self._sliderRect = rect || null;
+      // 首次拿到位置后补一次当前触点映射（异步回调可能晚于首次 move）
+      if (self._sliderDragging) {
+        self._applySliderX(self._touchClientX(e));
+      }
+    }).exec();
+  },
+
+  onSliderTouchMove: function (e) {
+    if (!this._sliderDragging) {
+      return;
+    }
+    this._applySliderX(this._touchClientX(e));
+  },
+
+  onSliderTouchEnd: function () {
+    this._sliderDragging = false;
   },
 
   // 模式预设 chips：非「自定义」直接写入 mode；「自定义」清空待填
@@ -119,10 +213,16 @@ Page({
   validate: function () {
     var mode = this.data.mode.trim();
     var remark = this.data.remark.trim();
-    if (!GAME_LIST[this.data.gameIndex]) {
-      validateToast('请选择游戏');
+    var customGame = this.data.customGame.trim();
+    if (!customGame && !GAME_LIST[this.data.gameIndex]) {
+      validateToast('请选择或输入游戏');
       return null;
     }
+    if (customGame.length > 20) {
+      validateToast('游戏名最多 20 字');
+      return null;
+    }
+    var game = customGame || GAME_LIST[this.data.gameIndex].name;
     if (!mode) {
       validateToast('请填写模式/地图');
       return null;
@@ -155,7 +255,7 @@ Page({
       startTimeLabel = TIME_OPTIONS[this.data.timeIndex];
     }
     return {
-      game: GAME_LIST[this.data.gameIndex].name,
+      game: game,
       mode: mode,
       maxPlayers: this.data.maxPlayers,
       remark: remark,

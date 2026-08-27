@@ -25,6 +25,25 @@
     >{{item}}</view>
   </scroll-view>
 
+  <!-- 邀请码直达：口述转告的 4 位码，输入即进房 -->
+  <view class="invite">
+    <input
+      class="sunk-input invite__input"
+      placeholder="有码吗？输入邀请码直达房间"
+      placeholder-class="sunk-placeholder"
+      maxlength="8"
+      confirm-type="go"
+      value="{{inviteCode}}"
+      bindinput="onInviteInput"
+      bindconfirm="onJoinByCode"
+    />
+    <view
+      class="btn btn--primary invite__btn"
+      hover-class="btn--primary-hover"
+      bindtap="onJoinByCode"
+    >进房</view>
+  </view>
+
   <!-- 我的房间（仅在有数据时出现） -->
   <block wx:if="{{filteredMyRooms.length}}">
     <view class="sec">
@@ -44,6 +63,7 @@
         status="{{item.status}}"
         remark="{{item.remark}}"
         roleText="{{item.roleText}}"
+        isMine="{{true}}"
         bind:tap="onRoomTap"
       />
     </view>

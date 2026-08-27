@@ -8,12 +8,17 @@
 
 const {
   VALID_GAMES, MIN_PLAYERS, MAX_PLAYERS,
-  VALID_TIME_LABELS, START_TIME_MAX_LENGTH
+  VALID_TIME_LABELS, START_TIME_MAX_LENGTH, GAME_MAX_LENGTH
 } = require('./constants');
 
-// 校验游戏枚举，非法时抛错（文案沿用 createRoom 原有约定）
+// 校验游戏名：预设枚举直通；枚举外视为自定义游戏名，trim 后 1-GAME_MAX_LENGTH 字。
+// 非法时抛错（文案沿用 createRoom 原有约定）
 function assertValidGame(game) {
-  if (!VALID_GAMES.includes(game)) throw new Error('不支持的游戏');
+  const value = String(game || '').trim();
+  if (!value) throw new Error('请选择或输入游戏');
+  if (!VALID_GAMES.includes(value) && value.length > GAME_MAX_LENGTH) {
+    throw new Error('游戏名最多 ' + GAME_MAX_LENGTH + ' 字');
+  }
 }
 
 // 校验房间人数范围，非法时抛错（文案沿用 createRoom 原有约定）

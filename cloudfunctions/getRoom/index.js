@@ -24,6 +24,8 @@ function buildRoomInfo(roomDoc, participantCount) {
     maxPlayers: d.maxPlayers,
     startTimeLabel: d.startTimeLabel || '现在开打',
     remark: d.remark || '',
+    // 邀请码（createRoom 落地时生成；历史存量房间无此字段则为空）
+    inviteCode: d.inviteCode || '',
     statusText: statusTextOf(d.status),
     status: d.status,
     hostOpenid: d.hostOpenid,

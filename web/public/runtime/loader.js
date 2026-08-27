@@ -12,10 +12,12 @@ WMP.loader = (function () {
   var moduleCache = {};  // path(无.js) -> module
 
   async function init() {
-    var man = await fetch('/mp/manifest.json').then(function (r) { return r.json(); });
+    // 启动时间戳破缓存：避免浏览器残留的旧强缓存（历史响应曾带 max-age=3600）
+    var bust = '?t=' + Date.now();
+    var man = await fetch('/mp/manifest.json' + bust).then(function (r) { return r.json(); });
     var list = man.files || [];
     await Promise.all(list.map(function (f) {
-      return fetch('/mp/' + encodeURI(f)).then(function (r) { return r.text(); }).then(function (t) {
+      return fetch('/mp/' + encodeURI(f) + bust).then(function (r) { return r.text(); }).then(function (t) {
         files[f] = t;
       });
     }));

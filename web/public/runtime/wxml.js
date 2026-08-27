@@ -377,6 +377,14 @@ WMP.wxml = (function () {
       var v = misc.value == null ? '' : String(misc.value);
       if (el.value !== v) el.value = v;
     }
+    // focus 属性：由 false → true 时拉起焦点（如创建页「其他游戏」格子聚焦输入框）
+    if ('focus' in misc && (vnode.tag === 'input' || vnode.tag === 'textarea')) {
+      var wantFocus = truthyAttr(misc.focus);
+      var wasFocus = old && old.misc ? truthyAttr(old.misc['focus']) : false;
+      if (wantFocus && !wasFocus) {
+        setTimeout(function () { try { el.focus(); } catch (e) {} }, 0);
+      }
+    }
     if (vnode.origTag === 'scroll-view') {
       var target = misc['scroll-into-view'];
       var oldTarget = old && old.misc ? old.misc['scroll-into-view'] : undefined;
@@ -384,8 +392,17 @@ WMP.wxml = (function () {
         var behavior = misc['scroll-with-animation'] ? 'smooth' : 'auto';
         // 等子节点挂载完成后再定位
         setTimeout(function () {
+          // 无溢出时不滚动：原生 scrollIntoView 会沿祖先滚动链传播，
+          // 锚点已可见时浏览器会去滚外层可滚祖先（如手机壳 .wx-content），导致页面位置被强制改写
+          if (el.scrollHeight <= el.clientHeight) return;
           var anchor = document.getElementById(target);
-          if (anchor && el.contains(anchor)) anchor.scrollIntoView({ block: 'end', behavior: behavior });
+          if (!anchor || !el.contains(anchor)) return;
+          // 只滚 scroll-view 自身，不用 scrollIntoView（会波及祖先）
+          var top = anchor.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop;
+          el.scrollTo({
+            top: Math.max(0, top - el.clientHeight + anchor.offsetHeight),
+            behavior: behavior
+          });
         }, 0);
       }
     }
@@ -401,14 +418,27 @@ WMP.wxml = (function () {
     return v === 'true' || v === true || v === 'True';
   }
 
-  function makeEvent(native, vnode, detail) {
-    return {
+  function makeEvent(native, vnode, detail, extra) {
+    var ds = vnode.dataset || {};
+    var ct = { dataset: ds, id: (vnode.id || '') };
+    // 指针类事件附带坐标（滑块拖拽等需要 clientX）
+    if (native && typeof native.clientX === 'number') {
+      ct.clientX = native.clientX;
+      ct.clientY = native.clientY;
+    }
+    var ev = {
       type: native && native.type || 'tap',
       detail: detail || {},
-      currentTarget: { dataset: vnode.dataset || {}, id: (vnode.id || '') },
-      target: { dataset: vnode.dataset || {}, id: (vnode.id || '') },
+      currentTarget: ct,
+      target: { dataset: ds, id: (vnode.id || '') },
       timeStamp: native ? native.timeStamp : Date.now()
     };
+    // touch 事件的触点列表（extra 由 fireTouch 传入）
+    if (extra) {
+      if (extra.touches) ev.touches = extra.touches;
+      if (extra.changedTouches) ev.changedTouches = extra.changedTouches;
+    }
+    return ev;
   }
 
   function attachListeners(el, vnode) {
@@ -458,6 +488,45 @@ WMP.wxml = (function () {
       var method = findMethod(vn.owner, h.name);
       if (method) method.call(vn.owner, makeEvent(e, vn, {}));
     });
+    // touchstart / touchmove / touchend（指针事件模拟，滑块拖拽等依赖）
+    var touchDown = false;
+    function fireTouch(evt, native) {
+      var vn = el.__vn;
+      if (!vn || vn.k === 'comp') return;
+      var h = vn.handlers && vn.handlers[evt];
+      if (!h) return;
+      if (h.catch) native.stopPropagation();
+      var touch = {
+        clientX: native.clientX,
+        clientY: native.clientY,
+        pageX: native.clientX + window.scrollX,
+        pageY: native.clientY + window.scrollY,
+        identifier: 0
+      };
+      var method = findMethod(vn.owner, h.name);
+      if (method) method.call(vn.owner, makeEvent(native, vn, {}, { touches: [touch], changedTouches: [touch] }));
+    }
+    el.addEventListener('pointerdown', function (e) {
+      var vn = el.__vn;
+      if (!vn || !vn.handlers || (!vn.handlers.touchstart && !vn.handlers.touchmove && !vn.handlers.touchend)) return;
+      touchDown = true;
+      // 拖拽期间禁止页面滚动/选中（对应小程序 catchtouchmove 行为）
+      if (vn.handlers.touchstart && vn.handlers.touchstart.catch) e.preventDefault();
+      fireTouch('touchstart', e);
+    });
+    el.addEventListener('pointermove', function (e) {
+      if (!touchDown) return;
+      var vn = el.__vn;
+      if (vn && vn.handlers && vn.handlers.touchmove && vn.handlers.touchmove.catch) e.preventDefault();
+      fireTouch('touchmove', e);
+    });
+    function endTouch(e) {
+      if (!touchDown) return;
+      touchDown = false;
+      fireTouch('touchend', e);
+    }
+    el.addEventListener('pointerup', endTouch);
+    el.addEventListener('pointercancel', endTouch);
     // hover-class 按压态
     el.addEventListener('pointerdown', function () {
       var vn = el.__vn;

@@ -100,6 +100,33 @@
   margin-right: 20rpx;
 }
 
+/* ---- 邀请码直达 ---- */
+.invite {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 0 36rpx;
+}
+
+/* 覆盖 sunk-input 的 100% 宽，与「进房」按钮同行 */
+.invite__input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  height: 80rpx;
+  border-radius: var(--shb-radius-md);
+}
+
+.invite__btn {
+  display: flex;
+  align-items: center;
+  height: 80rpx;
+  padding: 0 40rpx;
+  border-radius: var(--shb-radius-md);
+  font-size: var(--shb-fs-base);
+  letter-spacing: 2rpx;
+}
+
 /* ---- 分区头 ---- */
 .sec {
   display: flex;

@@ -53,9 +53,10 @@
 }
 
 .tabbar__fab {
-  width: 112rpx;
-  height: 112rpx;
-  margin-top: -60rpx;
+  /* 尺寸与两侧图标协调：不再做成巨球，凸起幅度也收敛 */
+  width: 88rpx;
+  height: 88rpx;
+  margin-top: -36rpx;
   border-radius: 50%;
   background: var(--shb-color-primary);
   display: flex;
@@ -67,8 +68,8 @@
 
 /* ＋ 号：两根圆角横竖条 */
 .tabbar__fab-plus {
-  width: 44rpx;
-  height: 8rpx;
+  width: 36rpx;
+  height: 6rpx;
   border-radius: var(--shb-radius-sm);
   background: var(--shb-text-inverse);
 }
@@ -78,8 +79,8 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 8rpx;
-  height: 44rpx;
+  width: 6rpx;
+  height: 36rpx;
   border-radius: var(--shb-radius-sm);
   background: var(--shb-text-inverse);
 }

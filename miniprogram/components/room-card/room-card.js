@@ -41,7 +41,9 @@ Component({
     // 备注（为空则不展示）
     remark: { type: String, value: '' },
     // 角色文案（我的房间用：房主/队员；空则不展示角色标）
-    roleText: { type: String, value: '' }
+    roleText: { type: String, value: '' },
+    // 本人已在房中（我的房间区传 true）：右侧胶囊显示「回到房间」
+    isMine: { type: Boolean, value: false }
   },
 
   data: {
