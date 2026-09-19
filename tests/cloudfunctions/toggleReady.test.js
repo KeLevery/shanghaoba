@@ -97,4 +97,30 @@ describe('toggleReady 云函数', () => {
     expect(room.lastActiveAt).toBeGreaterThan(0);
     expect(room.lastActiveAt).toBe(room.updatedAt);
   });
+
+  test('满员房间未全员就绪时保持 full 状态', async () => {
+    cloud.__setOpenid('p1');
+    seedRoom('full', 2);
+    cloud.__seed('participants', [
+      { _id: 'h1', roomId: 'r1', openid: 'host1', ready: false },
+      { _id: 'p1', roomId: 'r1', openid: 'p1', ready: false }
+    ]);
+
+    const result = await toggleReady.main({ roomId: 'r1' });
+    expect(result).toMatchObject({ ready: true, allReady: false, status: 'full' });
+    expect(cloud.__collection('rooms')[0].status).toBe('full');
+  });
+
+  test('满员 pending 房间取消准备后回退为 full 状态', async () => {
+    cloud.__setOpenid('p1');
+    seedRoom('pending', 2);
+    cloud.__seed('participants', [
+      { _id: 'h1', roomId: 'r1', openid: 'host1', ready: true },
+      { _id: 'p1', roomId: 'r1', openid: 'p1', ready: true }
+    ]);
+
+    const result = await toggleReady.main({ roomId: 'r1' });
+    expect(result).toMatchObject({ ready: false, allReady: false, status: 'full' });
+    expect(cloud.__collection('rooms')[0].status).toBe('full');
+  });
 });

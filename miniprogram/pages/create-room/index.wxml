@@ -113,8 +113,9 @@
       <view class="stepper__btn press-scale" hover-class="stepper__btn--hover" bindtap="increase">＋</view>
     </view>
     <view class="pslider__scale">
-      <text class="num">2 人</text>
-      <text class="num">20 人</text>
+      <text class="num">2</text>
+      <text class="num">10</text>
+      <text class="num">20</text>
     </view>
   </view>
 

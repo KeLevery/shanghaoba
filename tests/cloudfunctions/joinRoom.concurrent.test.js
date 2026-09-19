@@ -77,4 +77,28 @@ describe('joinRoom 并发抢名额', () => {
     fulfilled.forEach((r) => expect(r.value).toEqual({ joined: true }));
     expect(cloud.__collection('rooms')[0].status).toBe('full');
   });
+
+  test('20人满员上限并发抢最后一席：恰好20人成功，第21人被确定性补偿删除', async () => {
+    const initialParticipants = [{ _id: 'h1', roomId: 'r1', openid: 'host1', isHost: true, ready: false, createdAt: 0 }];
+    for (let i = 2; i <= 19; i++) {
+      initialParticipants.push({ _id: 'p' + i, roomId: 'r1', openid: 'user' + i, isHost: false, ready: false, createdAt: i });
+    }
+    cloud.__seed('rooms', [{
+      _id: 'r1', game: '无畏契约', maxPlayers: 20, hostOpenid: 'host1',
+      status: 'recruiting', createdAt: 0
+    }]);
+    cloud.__seed('participants', initialParticipants);
+
+    const results = await Promise.allSettled(startRace(['cand_a', 'cand_b']));
+    const fulfilled = results.filter((r) => r.status === 'fulfilled');
+    const rejected = results.filter((r) => r.status === 'rejected');
+
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0].reason.message).toBe('房间已满，下次早点来');
+
+    const participants = cloud.__collection('participants');
+    expect(participants).toHaveLength(20);
+    expect(cloud.__collection('rooms')[0].status).toBe('full');
+  });
 });

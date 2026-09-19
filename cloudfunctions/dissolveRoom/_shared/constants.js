@@ -19,7 +19,7 @@ const STATUS = {
 // 状态中文展示文案（listRooms / listMyRooms / getRoom 共用）
 const STATUS_TEXT = {
   recruiting: '招募中',
-  full: '已满',
+  full: '已满员',
   pending: '待房主开始',
   ready: '全员就绪 · 可以开打',
   dissolved: '已解散'

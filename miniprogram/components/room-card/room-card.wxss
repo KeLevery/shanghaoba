@@ -153,18 +153,31 @@
 
 /* 加入胶囊：青柠绿填充深字，带微光阴影 */
 .room-card__join {
-  height: 56rpx;
+  height: 54rpx;
   display: flex;
   align-items: center;
-  padding: 0 32rpx;
+  padding: 0 28rpx;
   border-radius: var(--shb-radius-full);
   background: var(--shb-color-primary);
   color: var(--shb-text-inverse);
   font-size: var(--shb-fs-sm);
   font-weight: var(--shb-fw-bold);
-  letter-spacing: 2rpx;
-  box-shadow: 0 4rpx 16rpx rgba(192, 232, 99, 0.25);
+  letter-spacing: 1rpx;
+  box-shadow: 0 4rpx 14rpx rgba(192, 232, 99, 0.28);
   transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.room-card__join--pending {
+  background: var(--shb-color-pending);
+  color: #1a1200;
+  box-shadow: 0 4rpx 14rpx rgba(255, 178, 36, 0.25);
+}
+
+.room-card__join--ready {
+  background: #a3e635;
+  color: var(--shb-text-inverse);
+  box-shadow: 0 4rpx 14rpx rgba(163, 230, 53, 0.25);
 }
 
 .room-card__join--mine {

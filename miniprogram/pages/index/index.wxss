@@ -13,31 +13,36 @@
   height: 200rpx;
 }
 
-/* ---- 页眉：大标题 + 铃铛 ---- */
+/* ---- 页眉：大标题居中（原型图风格） + 右侧铃铛 ---- */
 .apphead {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 36rpx 0;
+  justify-content: center;
+  padding: 24rpx 36rpx 12rpx;
 }
 
 .apphead__title {
-  font-size: var(--shb-fs-xxl);
+  font-size: 38rpx;
   font-weight: var(--shb-fw-bold);
   letter-spacing: 2rpx;
   color: var(--shb-text-primary);
+  text-align: center;
 }
 
-/* 铃铛：深色圆底 + 线性铃身 + 青柠绿角标点 */
+/* 铃铛：深色圆底 + 线性铃身 + 青柠绿角标点，右侧绝对定位 */
 .bell {
-  width: 68rpx;
-  height: 68rpx;
+  position: absolute;
+  right: 36rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64rpx;
+  height: 64rpx;
   border-radius: 50%;
   background: var(--shb-bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
 .bell--hover {

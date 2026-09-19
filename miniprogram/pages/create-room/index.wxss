@@ -13,10 +13,11 @@
 }
 
 .pagehead {
-  padding: 16rpx 36rpx 4rpx;
-  font-size: var(--shb-fs-xxl);
+  padding: 24rpx 36rpx 8rpx;
+  font-size: 38rpx;
   font-weight: var(--shb-fw-bold);
   color: var(--shb-text-primary);
+  text-align: center;
 }
 
 /* ---- 步骤向导指示条 ---- */
@@ -106,20 +107,22 @@
   color: var(--shb-text-tertiary);
 }
 
-/* ---- 游戏封面 2 列网格 ---- */
+/* ---- 游戏封面 3 列方阵网格（对齐设计原型图） ---- */
 .ggrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20rpx;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
 }
 
 .gitem {
-  border-radius: 28rpx;
+  border-radius: 20rpx;
   overflow: hidden;
   background: var(--shb-bg-elev);
   position: relative;
-  border: 4rpx solid transparent;
+  border: 3rpx solid transparent;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -130,12 +133,12 @@
 
 .gitem--active {
   border-color: var(--shb-color-primary);
-  box-shadow: 0 0 24rpx rgba(192, 232, 99, 0.35);
+  box-shadow: 0 0 20rpx rgba(192, 232, 99, 0.35);
 }
 
 /* 「其他游戏」自填格子：虚线边框 + 居中大＋，与预设游戏格区分但同尺寸 */
 .gitem--custom {
-  border: 4rpx dashed var(--shb-hairline-strong);
+  border: 3rpx dashed var(--shb-hairline-strong);
   background: transparent;
 }
 
@@ -146,13 +149,13 @@
 }
 
 .gitem__plus {
-  font-size: 64rpx;
+  font-size: 52rpx;
   font-weight: var(--shb-fw-bold);
   color: var(--shb-text-secondary);
 }
 
 .gitem--custom.gitem--active {
-  border: 4rpx solid var(--shb-color-primary);
+  border: 3rpx solid var(--shb-color-primary);
 }
 
 .gitem--custom .gitem__name {
@@ -164,24 +167,31 @@
 }
 
 .gitem__cover {
-  height: 184rpx;
+  height: 136rpx;
 }
 
 .gitem__row {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 24rpx 20rpx;
+  justify-content: center;
+  padding: 10rpx 8rpx 14rpx;
+  gap: 2rpx;
 }
 
 .gitem__name {
-  font-size: var(--shb-fs-sm);
+  font-size: var(--shb-fs-xs);
   font-weight: var(--shb-fw-bold);
   color: var(--shb-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
 }
 
 .gitem__def {
-  font-size: var(--shb-fs-xs);
+  font-size: 18rpx;
   color: var(--shb-text-tertiary);
   font-weight: var(--shb-fw-medium);
 }

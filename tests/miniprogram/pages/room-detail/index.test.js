@@ -162,6 +162,25 @@ describe('room-detail 页面（进入与分享自动入房）', () => {
       jest.useRealTimers();
     }
   });
+
+  test('单页进入（栈深为 1）getRoom 失败：降级 switchTab 回大厅', async () => {
+    stubCall({
+      getRoom: function () { return Promise.reject(new Error('房间已过期')); }
+    });
+    const page = createPage();
+    global.getCurrentPages = jest.fn(function () { return [{ route: 'pages/room-detail/index' }]; });
+
+    jest.useFakeTimers();
+    try {
+      await page.onLoad({ roomId: 'r1' });
+      expect(wxState.toasts).toContainEqual({ title: '房间已过期', icon: 'none' });
+      jest.advanceTimersByTime(900);
+      expect(wxState.switchTabs).toContainEqual({ url: '/pages/index/index' });
+    } finally {
+      delete global.getCurrentPages;
+      jest.useRealTimers();
+    }
+  });
 });
 
 describe('room-detail 页面（watcher 生命周期）', () => {
@@ -254,6 +273,33 @@ describe('room-detail 页面（participants/messages watcher 增量更新）', (
       await jest.advanceTimersByTimeAsync(800);
       var names = wx.cloud.callFunction.mock.calls.map(function (c) { return c[0].name; });
       expect(names[names.length - 1]).toBe('getRoom');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test('被房主移出：收到不含本人的快照时 toast、关闭 watcher 并退出', async () => {
+    var ctx = await enterStandardPage({
+      getRoom: roomResult({
+        myOpenid: 'me',
+        participants: [
+          { openid: 'host1', displayName: '房主', isHost: true, ready: false },
+          { openid: 'me', displayName: '我', isHost: false, ready: false }
+        ]
+      })
+    });
+
+    jest.useFakeTimers();
+    try {
+      ctx.fake.watchers.participants.handlers.onChange({
+        docs: [{ openid: 'host1', isHost: true, ready: false }]
+      });
+      expect(wxState.toasts).toContainEqual({ title: '你已被移出房间', icon: 'none' });
+      expect(ctx.fake.watchers.room.close).toHaveBeenCalled();
+      expect(ctx.fake.watchers.participants.close).toHaveBeenCalled();
+      expect(ctx.fake.watchers.messages.close).toHaveBeenCalled();
+      jest.advanceTimersByTime(700);
+      expect(wxState.navigations).toContainEqual({ back: true });
     } finally {
       jest.useRealTimers();
     }

@@ -64,6 +64,26 @@ Page({
     }
   },
 
+  // 安全返回：单页进入（如通过分享卡片直达，页面栈为 1）时降级 switchTab 回大厅，防卡死在死页面
+  safeNavigateBack(fallbackUrl) {
+    var hasMultiplePages = false;
+    try {
+      if (typeof getCurrentPages === 'function') {
+        var stack = getCurrentPages();
+        hasMultiplePages = stack && stack.length > 1;
+      } else {
+        hasMultiplePages = true;
+      }
+    } catch (e) {
+      hasMultiplePages = true;
+    }
+    if (hasMultiplePages) {
+      wx.navigateBack();
+    } else {
+      wx.switchTab({ url: fallbackUrl || '/pages/index/index' });
+    }
+  },
+
   // 通过分享进入时若还不是成员，先自动加入房间（🔒 分享即入房）
   async enterRoom() {
     try {
@@ -76,7 +96,7 @@ Page({
       this.applyRoomResult(result);
     } catch (error) {
       wx.showToast({ title: (error && error.message) || '房间不存在或已关闭', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 900);
+      setTimeout(() => this.safeNavigateBack(), 900);
     }
   },
 
@@ -99,8 +119,10 @@ Page({
     participants.forEach(p => { this._nameMap[p.openid] = p.displayName || ''; });
     this._knownMsgIds = {};
     messages.forEach(m => { this._knownMsgIds[m._id] = true; });
-    // 房主身份可直接推得本人 openid
-    if (result.isHost && room.hostOpenid) {
+    // 优先采用云函数直传的 myOpenid；房主身份次之
+    if (result.myOpenid) {
+      this._myOpenid = result.myOpenid;
+    } else if (result.isHost && room.hostOpenid) {
       this._myOpenid = room.hostOpenid;
     }
     this.setData({
@@ -224,7 +246,7 @@ Page({
         if (!snapshot.docs.length || snapshot.docs[0].status === 'dissolved') {
           wx.showToast({ title: '房间已解散', icon: 'none' });
           this.closeWatchers();
-          setTimeout(() => wx.navigateBack(), 700);
+          setTimeout(() => this.safeNavigateBack(), 700);
           return;
         }
         this.setData({ room: this.formatRoom(snapshot.docs[0]) });
@@ -264,9 +286,15 @@ Page({
         ready: !!d.ready
       };
     });
-    // 本人准备状态可能被其他端修改，保持 myReady 同步
+    // 本人准备状态可能被其他端修改，保持 myReady 同步；若已被房主移出则提示并退出
     if (this._myOpenid) {
       const mine = participants.filter(p => p.openid === this._myOpenid)[0];
+      if (!this.data.isHost && !mine) {
+        wx.showToast({ title: '你已被移出房间', icon: 'none' });
+        this.closeWatchers();
+        setTimeout(() => this.safeNavigateBack(), 700);
+        return;
+      }
       if (mine && mine.ready !== this.data.myReady) {
         this.setData({ myReady: mine.ready });
       }
@@ -457,7 +485,8 @@ Page({
         }
         try {
           await call('leaveRoom', { roomId: this.data.roomId });
-          wx.navigateBack();
+          this.closeWatchers();
+          this.safeNavigateBack();
         } catch (error) {
           // call 已 toast
         }

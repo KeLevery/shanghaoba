@@ -284,7 +284,7 @@ Page({
       setTimeout(function () {
         // 跳转后再复位，避免 toast 展示期间重复点击重复建房
         that.setData({ submitting: false });
-        wx.redirectTo({ url: '/pages/room-detail/index?roomId=' + roomId });
+        wx.navigateTo({ url: '/pages/room-detail/index?roomId=' + roomId });
       }, 500);
     } catch (err) {
       // 云调用错误提示由 cloud.js 统一处理，这里不重复 toast

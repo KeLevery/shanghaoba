@@ -55,13 +55,24 @@ exports.main = async (event) => {
   const partRes = await db.collection('participants')
     .where({ roomId })
     .orderBy('createdAt', 'asc')
+    .limit(100)
+    .get();
+
+  const msgRes = await db.collection('messages')
+    .where({ roomId })
+    .orderBy('createdAt', 'asc')
+    .limit(100)
     .get();
 
   const openids = partRes.data.map(p => p.openid);
+  const msgOpenids = msgRes.data.map(m => m.openid);
+  const allOpenids = [...new Set([...openids, ...msgOpenids])];
+
   let displayNameMap = {};
-  if (openids.length) {
+  if (allOpenids.length) {
     const userRes = await db.collection('users')
-      .where({ openid: db.command.in(openids) })
+      .where({ openid: db.command.in(allOpenids) })
+      .limit(100)
       .get();
     userRes.data.forEach(u => { displayNameMap[u.openid] = u.gameNickname || ''; });
   }
@@ -74,22 +85,10 @@ exports.main = async (event) => {
     ready: !!p.ready
   }));
 
-  const msgRes = await db.collection('messages')
-    .where({ roomId })
-    .orderBy('createdAt', 'asc')
-    .limit(100)
-    .get();
-
-  const msgOpenids = [...new Set(msgRes.data.map(m => m.openid))];
-  const msgNameMap = {};
-  if (msgOpenids.length) {
-    const userRes = await db.collection('users').where({ openid: db.command.in(msgOpenids) }).get();
-    userRes.data.forEach(u => { msgNameMap[u.openid] = u.gameNickname || ''; });
-  }
   const messages = msgRes.data.map(m => ({
     _id: m._id,
     content: m.content,
-    displayName: msgNameMap[m.openid] || '',
+    displayName: displayNameMap[m.openid] || '',
     createdAt: m.createdAt
   }));
 
@@ -104,6 +103,7 @@ exports.main = async (event) => {
     messages,
     isHost,
     myReady,
-    isMember
+    isMember,
+    myOpenid: openid
   };
 };

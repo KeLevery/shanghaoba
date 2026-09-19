@@ -47,9 +47,15 @@ exports.main = async (event) => {
     const ordered = await db.collection('participants')
       .where({ roomId })
       .orderBy('createdAt', 'asc')
+      .limit(100)
       .get();
-    const myRank = ordered.data.findIndex((p) => p._id === added._id);
-    if (myRank >= roomDoc.maxPlayers) {
+    // 确定性排序：同毫秒加入按 _id 升序决胜，确保所有并发请求视图绝对一致
+    const sorted = (ordered.data || []).slice().sort((a, b) => {
+      if (a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
+      return String(a._id).localeCompare(String(b._id));
+    });
+    const myRank = sorted.findIndex((p) => p._id === added._id);
+    if (myRank === -1 || myRank >= roomDoc.maxPlayers) {
       await db.collection('participants').doc(added._id).remove();
       await db.collection('rooms').doc(roomId).update({
         data: { status: STATUS.FULL, updatedAt: Date.now() }

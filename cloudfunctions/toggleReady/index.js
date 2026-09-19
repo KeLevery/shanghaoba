@@ -35,7 +35,10 @@ exports.main = async (event) => {
     const participants = (await transaction.collection('participants').where({ roomId }).get()).data;
     const allReady = participants.length >= 2 && participants.every(participant => !!participant.ready);
     // 全员准备只进入「待开打」，由房主在 startRoom 中正式开始；不在此发送通知。
-    const status = allReady ? STATUS.PENDING : STATUS.RECRUITING;
+    // 若未全员准备：已达人数上限则保持/退回 full，未达上限则为 recruiting
+    const status = allReady
+      ? STATUS.PENDING
+      : (participants.length >= room.maxPlayers ? STATUS.FULL : STATUS.RECRUITING);
 
     await transaction.collection('rooms').doc(roomId).update({
       data: { status, updatedAt: now, lastActiveAt: now, allReadyAt: allReady ? now : null }

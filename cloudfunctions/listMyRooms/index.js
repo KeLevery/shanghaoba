@@ -28,12 +28,18 @@ exports.main = async () => {
   const openid = cloud.getWXContext().OPENID;
   const participantRes = await db.collection('participants')
     .where({ openid })
-    .limit(1000)
+    .orderBy('createdAt', 'desc')
+    .limit(200)
     .get();
 
   const participantByRoomId = {};
-  participantRes.data.forEach((participant) => { participantByRoomId[participant.roomId] = participant; });
-  const roomIds = Object.keys(participantByRoomId);
+  participantRes.data.forEach((participant) => {
+    if (!participantByRoomId[participant.roomId]) {
+      participantByRoomId[participant.roomId] = participant;
+    }
+  });
+  // 限制单次查询房间数上限为 50，防 db.command.in 数组超限
+  const roomIds = Object.keys(participantByRoomId).slice(0, 50);
   if (!roomIds.length) return { rooms: [] };
 
   const roomRes = await db.collection('rooms')

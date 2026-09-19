@@ -39,13 +39,18 @@
     </view>
   </view>
 
-  <!-- 右侧状态/行动胶囊 -->
+  <!-- 右侧状态/行动胶囊（对齐设计图：招募中/进行中等青柠绿胶囊） -->
   <view class="room-card__side">
     <text class="room-card__dots">···</text>
     <!-- 本人已在房中：回房入口 -->
     <view wx:if="{{isMine && status !== 'dissolved'}}" class="room-card__join room-card__join--mine">回到房间</view>
-    <!-- 未满员：青柠绿「加入」胶囊；满员：灰胶囊；其他状态：状态标签 -->
-    <view wx:elif="{{status === 'recruiting' || status === 'pending'}}" class="room-card__join">{{status === 'pending' ? '等待中' : '加入'}}</view>
+    <!-- 招募中：鲜亮青柠绿「招募中」胶囊 -->
+    <view wx:elif="{{status === 'recruiting' && !isFull}}" class="room-card__join">招募中</view>
+    <!-- 等待中 / 准备就绪：亮黄色胶囊 -->
+    <view wx:elif="{{status === 'pending'}}" class="room-card__join room-card__join--pending">等待开始</view>
+    <!-- 进行中：浅绿胶囊 -->
+    <view wx:elif="{{status === 'ready'}}" class="room-card__join room-card__join--ready">进行中</view>
+    <!-- 已满员：暗底胶囊 -->
     <view wx:elif="{{isFull}}" class="room-card__join room-card__join--full">已满员</view>
     <view wx:else class="tagdot {{status === 'dissolved' ? 'tagdot--gray' : ''}}">{{statusText}}</view>
   </view>

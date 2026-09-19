@@ -13,10 +13,11 @@
 }
 
 .pagehead {
-  padding: 16rpx 36rpx 8rpx;
-  font-size: var(--shb-fs-xxl);
+  padding: 24rpx 36rpx 8rpx;
+  font-size: 38rpx;
   font-weight: var(--shb-fw-bold);
   color: var(--shb-text-primary);
+  text-align: center;
 }
 
 .loading {
