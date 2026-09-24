@@ -70,7 +70,10 @@ Page({
         var now = Date.now();
         var room = null;
         var sawExpired = false;
-        (res.data || []).some(function (d) {
+        var list = (res.data || []).slice().sort(function (a, b) {
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+        list.some(function (d) {
           if (d.status === 'dissolved') {
             return false;
           }

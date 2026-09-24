@@ -498,6 +498,26 @@ describe('room-detail 页面（操作映射与按钮显隐数据）', () => {
     expect(ctx.page._lastSentMessageId).toBe('m9');
   });
 
+  test('leaveRoom：主动退出后即使收到无本人快照也不报「被移出」toast', async () => {
+    var ctx = await enterStandardPage();
+    stubCall({ leaveRoom: { left: true } });
+    ctx.page.leaveRoom();
+    // 模拟退房过程中快照先推过来（不含本人）
+    ctx.fake.watchers.participants.handlers.onChange({ docs: [] });
+    await flushAll();
+
+    var kickToast = wxState.toasts.find(t => t.title === '你已被移出房间');
+    expect(kickToast).toBeUndefined();
+  });
+
+  test('sendMessage：失败时恢复输入框内容', async () => {
+    var ctx = await enterStandardPage();
+    wx.cloud.callFunction = jest.fn(() => Promise.reject(new Error('网络失败')));
+    ctx.page.setData({ messageContent: '重要消息' });
+    await ctx.page.sendMessage();
+    expect(ctx.page.data.messageContent).toBe('重要消息');
+  });
+
   test('onShareAppMessage 分享卡片 path 携带 roomId', async () => {
     var ctx = await enterStandardPage();
     var share = ctx.page.onShareAppMessage();

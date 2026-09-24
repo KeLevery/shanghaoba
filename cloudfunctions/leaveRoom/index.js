@@ -17,6 +17,7 @@ exports.main = async (event) => {
   } catch (error) {
     throw new Error('房间不存在或已关闭');
   }
+  if (roomDoc.status === STATUS.DISSOLVED) throw new Error('房间已解散');
 
   const targetOpenid = event.targetOpenid || openid;
   const isSelf = targetOpenid === openid;

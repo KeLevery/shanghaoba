@@ -87,6 +87,7 @@ exports.main = async (event) => {
 
   const messages = msgRes.data.map(m => ({
     _id: m._id,
+    openid: m.openid,
     content: m.content,
     displayName: displayNameMap[m.openid] || '',
     createdAt: m.createdAt

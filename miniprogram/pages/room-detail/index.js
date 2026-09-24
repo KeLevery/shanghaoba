@@ -56,6 +56,12 @@ Page({
     this._nameMap = {}; // openid → displayName（watcher 快照只有原始字段）
     this._lastSentMessageId = ''; // 最近一次 sendMessage 返回的 messageId
     this._hydrateTimer = null; // 昵称补水防抖定时器
+    this._navTimer = null; // 页面导航/退出定时器
+    this._enterFailTimer = null; // 入房失败返回定时器
+    this._isLeaving = false; // 是否本人正在主动退出房间（防误触发被踢提示）
+    this._isDissolving = false; // 是否本人正在主动解散房间（防 watcher 触发二次返回）
+    this._isSendingMessage = false; // 发送消息防抖防重入
+    this._isTogglingReady = false; // 切换准备防抖防重入
     this.setData({ roomId: options.roomId, activeTab: initialTab });
     await this.enterRoom();
     if (this.data.room) {
@@ -96,7 +102,7 @@ Page({
       this.applyRoomResult(result);
     } catch (error) {
       wx.showToast({ title: (error && error.message) || '房间不存在或已关闭', icon: 'none' });
-      setTimeout(() => this.safeNavigateBack(), 900);
+      this._enterFailTimer = setTimeout(() => this.safeNavigateBack(), 900);
     }
   },
 
@@ -244,9 +250,11 @@ Page({
       onChange: snapshot => {
         // 软删除：文档还在但 status 变为 dissolved（🔒）
         if (!snapshot.docs.length || snapshot.docs[0].status === 'dissolved') {
-          wx.showToast({ title: '房间已解散', icon: 'none' });
-          this.closeWatchers();
-          setTimeout(() => this.safeNavigateBack(), 700);
+          if (!this._isDissolving) {
+            wx.showToast({ title: '房间已解散', icon: 'none' });
+            this.closeWatchers();
+            this._navTimer = setTimeout(() => this.safeNavigateBack(), 700);
+          }
           return;
         }
         this.setData({ room: this.formatRoom(snapshot.docs[0]) });
@@ -289,10 +297,10 @@ Page({
     // 本人准备状态可能被其他端修改，保持 myReady 同步；若已被房主移出则提示并退出
     if (this._myOpenid) {
       const mine = participants.filter(p => p.openid === this._myOpenid)[0];
-      if (!this.data.isHost && !mine) {
+      if (!this.data.isHost && !mine && !this._isLeaving) {
         wx.showToast({ title: '你已被移出房间', icon: 'none' });
         this.closeWatchers();
-        setTimeout(() => this.safeNavigateBack(), 700);
+        this._navTimer = setTimeout(() => this.safeNavigateBack(), 700);
         return;
       }
       if (mine && mine.ready !== this.data.myReady) {
@@ -366,6 +374,14 @@ Page({
       clearTimeout(this._hydrateTimer);
       this._hydrateTimer = null;
     }
+    if (this._navTimer) {
+      clearTimeout(this._navTimer);
+      this._navTimer = null;
+    }
+    if (this._enterFailTimer) {
+      clearTimeout(this._enterFailTimer);
+      this._enterFailTimer = null;
+    }
   },
 
   onUnload() {
@@ -391,38 +407,48 @@ Page({
 
   async sendMessage() {
     const content = this.data.messageContent.trim();
-    if (!content) {
+    if (!content || this._isSendingMessage) {
       return;
     }
+    this._isSendingMessage = true;
+    this.setData({ messageContent: '' });
     try {
       const result = await call('sendMessage', { roomId: this.data.roomId, content: content }, { loading: false });
       this._lastSentMessageId = (result && result.messageId) || '';
-      this.setData({ messageContent: '' });
       // 新消息由 messageWatcher 增量 append，无需手动刷新
     } catch (error) {
-      // call 已 toast
+      // 发送失败恢复输入框内容，方便重试
+      this.setData({ messageContent: content });
+    } finally {
+      this._isSendingMessage = false;
     }
   },
 
   // ---- 准备 / 开始 / 退出 / 解散 / 移除（🔒 操作映射不变）----
   async toggleReady() {
-    // 配置过模板时，准备前请求订阅授权；授权失败不阻断准备流程（🔒 诚实行为）
-    if (!this.data.myReady && roomReadyTemplateId && wx.requestSubscribeMessage) {
-      try {
-        await new Promise(function (resolve, reject) {
-          wx.requestSubscribeMessage({ tmplIds: [roomReadyTemplateId], success: resolve, fail: reject });
-        });
-      } catch (error) {
-        // 用户拒绝授权不影响 toggleReady
-      }
+    if (this._isTogglingReady) {
+      return;
     }
+    this._isTogglingReady = true;
     try {
+      // 配置过模板时，准备前请求订阅授权；授权失败不阻断准备流程（🔒 诚实行为）
+      if (!this.data.myReady && roomReadyTemplateId && wx.requestSubscribeMessage) {
+        try {
+          await new Promise(function (resolve, reject) {
+            wx.requestSubscribeMessage({ tmplIds: [roomReadyTemplateId], success: resolve, fail: reject });
+          });
+        } catch (error) {
+          // 用户拒绝授权不影响 toggleReady
+        }
+      }
       const result = await call('toggleReady', { roomId: this.data.roomId });
       this.setData({ myReady: !!(result && result.ready) });
       // 本人操作后重拉一次，校准房间状态与成员数据
       await this.loadRoom();
     } catch (error) {
       // call 已 toast
+    } finally {
+      this._isTogglingReady = false;
     }
   },
 
@@ -483,12 +509,13 @@ Page({
         if (!confirm) {
           return;
         }
+        this._isLeaving = true;
         try {
           await call('leaveRoom', { roomId: this.data.roomId });
           this.closeWatchers();
           this.safeNavigateBack();
         } catch (error) {
-          // call 已 toast
+          this._isLeaving = false;
         }
       }
     });
@@ -503,11 +530,13 @@ Page({
         if (!confirm) {
           return;
         }
+        this._isDissolving = true;
         try {
           await call('dissolveRoom', { roomId: this.data.roomId });
+          this.closeWatchers();
           wx.reLaunch({ url: '/pages/index/index' });
         } catch (error) {
-          // call 已 toast
+          this._isDissolving = false;
         }
       }
     });

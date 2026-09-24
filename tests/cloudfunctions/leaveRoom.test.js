@@ -88,4 +88,11 @@ describe('leaveRoom 云函数', () => {
     cloud.__setOpenid('p1');
     await expect(leaveRoom.main({ roomId: 'nope' })).rejects.toThrow('房间不存在或已关闭');
   });
+
+  test('已解散房间不能退出', async () => {
+    cloud.__setOpenid('p1');
+    seedRoom('dissolved');
+    seedMembers([{ openid: 'host1' }, { openid: 'p1' }]);
+    await expect(leaveRoom.main({ roomId: 'r1' })).rejects.toThrow('房间已解散');
+  });
 });

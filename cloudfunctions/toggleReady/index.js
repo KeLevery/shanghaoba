@@ -10,42 +10,38 @@ exports.main = async (event) => {
   const roomId = event.roomId;
   if (!roomId) throw new Error('缺少房间 ID');
 
-  const transition = await db.runTransaction(async (transaction) => {
-    let room;
-    try {
-      room = (await transaction.collection('rooms').doc(roomId).get()).data;
-    } catch (error) {
-      throw new Error('房间不存在或已关闭');
-    }
-    if (room.status === STATUS.DISSOLVED) throw new Error('房间已解散');
-    // 已开打（ready）后锁定准备状态：此时取消准备会把状态倒退回招募中，
-    // 出现「已开打但房主未准备」的矛盾展示
-    if (room.status === STATUS.READY) throw new Error('已开打，不能再修改准备状态');
+  let room;
+  try {
+    room = (await db.collection('rooms').doc(roomId).get()).data;
+  } catch (error) {
+    throw new Error('房间不存在或已关闭');
+  }
+  if (room.status === STATUS.DISSOLVED) throw new Error('房间已解散');
+  // 已开打（ready）后锁定准备状态：此时取消准备会把状态倒退回招募中，
+  // 出现「已开打但房主未准备」的矛盾展示
+  if (room.status === STATUS.READY) throw new Error('已开打，不能再修改准备状态');
 
-    const memberRes = await transaction.collection('participants')
-      .where({ roomId, openid })
-      .limit(1)
-      .get();
-    if (!memberRes.data.length) throw new Error('你不在这个房间里');
+  const memberRes = await db.collection('participants')
+    .where({ roomId, openid })
+    .limit(1)
+    .get();
+  if (!memberRes.data.length) throw new Error('你不在这个房间里');
 
-    const ready = !memberRes.data[0].ready;
-    const now = Date.now();
-    await transaction.collection('participants').doc(memberRes.data[0]._id).update({ data: { ready } });
+  const ready = !memberRes.data[0].ready;
+  const now = Date.now();
+  await db.collection('participants').doc(memberRes.data[0]._id).update({ data: { ready } });
 
-    const participants = (await transaction.collection('participants').where({ roomId }).get()).data;
-    const allReady = participants.length >= 2 && participants.every(participant => !!participant.ready);
-    // 全员准备只进入「待开打」，由房主在 startRoom 中正式开始；不在此发送通知。
-    // 若未全员准备：已达人数上限则保持/退回 full，未达上限则为 recruiting
-    const status = allReady
-      ? STATUS.PENDING
-      : (participants.length >= room.maxPlayers ? STATUS.FULL : STATUS.RECRUITING);
+  const participants = (await db.collection('participants').where({ roomId }).get()).data;
+  const allReady = participants.length >= 2 && participants.every(participant => !!participant.ready);
+  // 全员准备只进入「待开打」，由房主在 startRoom 中正式开始；不在此发送通知。
+  // 若未全员准备：已达人数上限则保持/退回 full，未达上限则为 recruiting
+  const status = allReady
+    ? STATUS.PENDING
+    : (participants.length >= room.maxPlayers ? STATUS.FULL : STATUS.RECRUITING);
 
-    await transaction.collection('rooms').doc(roomId).update({
-      data: { status, updatedAt: now, lastActiveAt: now, allReadyAt: allReady ? now : null }
-    });
-
-    return { ready, allReady, status };
+  await db.collection('rooms').doc(roomId).update({
+    data: { status, updatedAt: now, lastActiveAt: now, allReadyAt: allReady ? now : null }
   });
 
-  return { ready: transition.ready, allReady: transition.allReady, status: transition.status };
+  return { ready, allReady, status };
 };

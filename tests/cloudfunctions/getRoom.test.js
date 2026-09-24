@@ -19,6 +19,8 @@ describe('getRoom 云函数（messages 昵称映射）', () => {
     expect(res.myOpenid).toBe('viewer');
     expect(res.participants[0].displayName).toBe('阿伟');
     expect(res.messages[0].displayName).toBe('阿伟');
+    expect(res.messages[0].openid).toBe('host1');
     expect(res.messages[1].displayName).toBe('你');
+    expect(res.messages[1].openid).toBe('viewer');
   });
 });

@@ -281,7 +281,8 @@ Page({
       wx.showToast({ title: '召集已发起', icon: 'success' });
       var roomId = result.roomId;
       var that = this;
-      setTimeout(function () {
+      this._navTimer = setTimeout(function () {
+        that._navTimer = null;
         // 跳转后再复位，避免 toast 展示期间重复点击重复建房
         that.setData({ submitting: false });
         wx.navigateTo({ url: '/pages/room-detail/index?roomId=' + roomId });
@@ -289,6 +290,13 @@ Page({
     } catch (err) {
       // 云调用错误提示由 cloud.js 统一处理，这里不重复 toast
       this.setData({ submitting: false });
+    }
+  },
+
+  onUnload: function () {
+    if (this._navTimer) {
+      clearTimeout(this._navTimer);
+      this._navTimer = null;
     }
   }
 });

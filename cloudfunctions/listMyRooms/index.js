@@ -38,8 +38,8 @@ exports.main = async () => {
       participantByRoomId[participant.roomId] = participant;
     }
   });
-  // 限制单次查询房间数上限为 50，防 db.command.in 数组超限
-  const roomIds = Object.keys(participantByRoomId).slice(0, 50);
+  // 扩大单次查询房间数上限为 100，防历史解散房间遮蔽活跃房间
+  const roomIds = Object.keys(participantByRoomId).slice(0, 100);
   if (!roomIds.length) return { rooms: [] };
 
   const roomRes = await db.collection('rooms')
@@ -63,5 +63,5 @@ exports.main = async () => {
       return b.updatedAt - a.updatedAt;
     });
 
-  return { rooms };
+  return { rooms: rooms.slice(0, 50) };
 };
